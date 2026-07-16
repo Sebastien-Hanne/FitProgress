@@ -86,6 +86,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Feedback::class, orphanRemoval: true)]
     private Collection $feedbacks;
 
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $updatedAt = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -102,6 +108,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\PreUpdate]
     public function updateTimestamp(): void
+    }
+
+    #[ORM\PreUpdate]
+    public function onPreUpdate(): void
     {
         $this->updatedAt = new \DateTimeImmutable();
     }
