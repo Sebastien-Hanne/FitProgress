@@ -215,4 +215,20 @@ erDiagram
         string motivational
         string structured
     }
+
+     ENUM_MOOD {
+        string verybad
+        string bad
+        string stable
+        string good
+        string excellent
+    }
+
+    ENUM_ENERGY_LEVEL {
+        string very_low
+        string low
+        string medium
+        string high
+        string very_high
+    }
 ```
