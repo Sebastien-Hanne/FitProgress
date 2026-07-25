@@ -86,6 +86,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Feedback::class, orphanRemoval: true)]
     private Collection $feedbacks;
 
+    #[ORM\Column]
+    private bool $isVerified = false;
+
 
     public function __construct()
     {
@@ -318,5 +321,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getFeedbacks(): Collection
     {
         return $this->feedbacks;
+    }
+
+    public function isVerified(): bool
+    {
+        return $this->isVerified;
+    }
+
+    public function setIsVerified(bool $isVerified): static
+    {
+        $this->isVerified = $isVerified;
+
+        return $this;
     }
 }

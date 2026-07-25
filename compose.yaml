@@ -1,4 +1,17 @@
 services:
+  php:
+    build: .
+    container_name: fitprogress_php
+    working_dir: /var/www/html
+    volumes:
+        - .:/var/www/html
+    ports:
+      - "8000:8000"
+    command: php -S 0.0.0.0:8000 -t public
+    depends_on:
+      database:
+        condition: service_healthy
+
   database:
     image: mariadb:11
     environment:
