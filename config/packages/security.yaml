@@ -8,6 +8,10 @@ security:
                 class: App\Entity\User
                 property: email
 
+    role_hierarchy:
+        ROLE_COACH: ROLE_USER
+        ROLE_ADMIN: [ROLE_USER, ROLE_COACH]
+
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js|build|assets)/
@@ -32,24 +36,26 @@ security:
         - { path: ^/$, roles: PUBLIC_ACCESS }
         - { path: ^/login$, roles: PUBLIC_ACCESS }
         - { path: ^/register$, roles: PUBLIC_ACCESS }
+        - { path: ^/register/coach$, roles: PUBLIC_ACCESS }
+        - { path: ^/logout$, roles: PUBLIC_ACCESS }
 
         # Administration
         - { path: ^/admin, roles: ROLE_ADMIN }
 
-        # Espace utilisateur
+        # Espace coach uniquement
+        - { path: ^/coach, roles: ROLE_COACH }
+
+        # Espace utilisateur uniquement
         - { path: ^/journal, roles: ROLE_USER }
         - { path: ^/goal, roles: ROLE_USER }
         - { path: ^/history, roles: ROLE_USER }
         - { path: ^/export, roles: ROLE_USER }
         - { path: ^/choisir-coach, roles: ROLE_USER }
 
-        # Espace coach
-        - { path: ^/coach, roles: ROLE_COACH }
-
-        # Espace commun
-        - { path: ^/dashboard, roles: [ROLE_USER, ROLE_COACH] }
-        - { path: ^/profile, roles: [ROLE_USER, ROLE_COACH] }
-        - { path: ^/messages, roles: [ROLE_USER, ROLE_COACH] }
-        - { path: ^/notifications, roles: [ROLE_USER, ROLE_COACH] }
-        - { path: ^/sessions, roles: [ROLE_USER, ROLE_COACH] }
-        - { path: ^/feedback, roles: [ROLE_USER, ROLE_COACH] }
+        # Espace commun (ROLE_USER suffit grâce à role_hierarchy)
+        - { path: ^/dashboard, roles: ROLE_USER }
+        - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/messages, roles: ROLE_USER }
+        - { path: ^/notifications, roles: ROLE_USER }
+        - { path: ^/sessions, roles: ROLE_USER }
+        - { path: ^/feedback, roles: ROLE_USER }
