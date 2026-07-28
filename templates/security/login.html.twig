@@ -1,28 +1,120 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in!{% endblock %}
+{% block title %}Connexion | FitProgress{% endblock %}
 
 {% block body %}
-<form method="post">
-    {% if error %}
-        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-    {% endif %}
+<div class="min-h-screen bg-slate-500/80 flex items-center justify-center p-4 py-8 font-sans">
+    
+    {# overflow-hidden pour que l'image respecte les bords arrondis de la carte #}
+    <div class="max-w-md w-full bg-[#f4f9fb] rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-100">
 
-    {% if app.user %}
-        <div class="mb-3">
-            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ logout_path() }}">Logout</a>
+        {# Image d'en-tête via Symfony asset() #}
+        <div class="w-full h-48 overflow-hidden bg-slate-200">
+            <img src="{{ asset('img/logo.png') }}" alt="FitProgress Training" class="w-full h-full object-cover">
         </div>
-    {% endif %}
 
-    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-    <label for="inputEmail">Email</label>
-    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
-    <label for="inputPassword">Password</label>
-    <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
-    <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+        <div class="p-7">
 
-    <button class="btn btn-lg btn-primary" type="submit">
-        Sign in
-    </button>
-</form>
-{% endblock %}
+            {# Messages Flash #}
+            {% for message in app.flashes('success') %}
+                <div class="mb-4 p-3 text-xs font-semibold text-emerald-800 bg-emerald-100/80 rounded-2xl border border-emerald-200">
+                    {{ message }}
+                </div>
+            {% endfor %}
+            {% for message in app.flashes('error') %}
+                <div class="mb-4 p-3 text-xs font-semibold text-red-800 bg-red-100/80 rounded-2xl border border-red-200">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            {# Gestion de l'erreur d'authentification Symfony #}
+            {% if error %}
+                <div class="mb-4 p-3 text-xs font-semibold text-red-800 bg-red-100/80 rounded-2xl border border-red-200">
+                    {{ error.messageKey|trans(error.messageData, 'security') }}
+                </div>
+            {% endif %}
+
+            {# Si déjà connecté, on le redirige (sécurité) #}
+            {% if app.user %}
+                <div class="mb-3 text-center text-xs text-slate-500">
+                    Vous êtes connecté en tant que {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}" class="text-emerald-600 font-bold hover:underline">Déconnexion</a>
+                </div>
+            {% else %}
+
+                <form method="post" class="space-y-4">
+
+                    {# --- CHAMP EMAIL --- #}
+                    <div>
+                        <label for="inputEmail" class="block text-xs font-bold text-[#1a2b48] mb-1">Email</label>
+                        <div class="relative">
+                            <input type="email" value="{{ last_username }}" name="email" id="inputEmail" 
+                                class="w-full pl-4 pr-10 py-2.5 bg-white border border-emerald-300/60 rounded-2xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all" 
+                                autocomplete="email" required autofocus placeholder="nom@exemple.com">
+                            <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    {# --- CHAMP MOT DE PASSE --- #}
+                    <div>
+                        <label for="inputPassword" class="block text-xs font-bold text-[#1a2b48] mb-1">Mot de passe</label>
+                        <div class="relative">
+                            <input type="password" name="password" id="inputPassword" 
+                                class="w-full pl-4 pr-10 py-2.5 bg-white border border-emerald-300/60 rounded-2xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all" 
+                                autocomplete="current-password" required placeholder="••••••••">
+                            <button type="button" onclick="togglePasswordVisibility('inputPassword', this)" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-emerald-600 focus:outline-none transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    {# Lien Mot de passe oublié #}
+                    <div class="text-right -mt-1">
+                        <a href="#" class="text-[10px] text-slate-500 hover:text-emerald-600 transition-colors font-medium">Mot de passe oublié ?</a>
+                    </div>
+
+                    {# Jeton CSRF #}
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                    {# Bouton de validation #}
+                    <button type="submit" class="w-full mt-2 bg-[#10b981] hover:bg-[#059669] active:scale-[0.99] text-white font-black py-3 px-4 rounded-2xl shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 text-xs cursor-pointer">
+                        <span>Se connecter</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+                    </button>
+                </form>
+
+                {# Bannière Statistique #}
+                <div class="mt-6 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-4 text-center shadow-md">
+                    <p class="text-white font-black text-lg leading-none">84%</p>
+                    <p class="text-indigo-100 text-[10px] leading-tight mt-1">des utilisateurs FitProgress atteignent leurs objectifs en 3 mois</p>
+                </div>
+
+            {% endif %}
+
+            {# Pied de page #}
+            <div class="mt-5 pt-3 text-center text-xs text-slate-500">
+                Pas encore inscrit ?
+                <a href="{{ path('app_register') }}" class="text-emerald-600 font-bold hover:underline ml-1">S'inscrire</a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    function togglePasswordVisibility(inputId, btn) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+        if (input.type === 'password') {
+            input.type = 'text';
+            btn.classList.add('text-emerald-600');
+            btn.classList.remove('text-slate-400');
+        } else {
+            input.type = 'password';
+            btn.classList.remove('text-emerald-600');
+            btn.classList.add('text-slate-400');
+        }
+    }
+</script>
+{% endblock %}  
