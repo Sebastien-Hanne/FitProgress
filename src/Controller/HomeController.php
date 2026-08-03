@@ -11,7 +11,7 @@ class HomeController extends AbstractController
     #[Route('/', name: 'app_home', methods: ['GET'])]
     public function home(): Response
     {
-        return new Response('FitProgress');
+        return $this->render('home/index.html.twig');
     }
 
     #[Route('/dashboard', name: 'dashboard', methods: ['GET'])]

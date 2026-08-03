@@ -1,0 +1,139 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}FitProgress | Libérez votre potentiel{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-white font-sans text-[#1A2B48]">
+    <div class="w-full overflow-hidden bg-white">
+        {% include 'components/_public_header.html.twig' %}
+
+        <main>
+            <section class="mx-auto grid max-w-7xl items-center gap-7 px-5 py-7 sm:px-8 lg:grid-cols-[0.82fr_1.18fr] lg:gap-14 lg:px-10 lg:py-16" aria-label="Présentation de FitProgress">
+                <div>
+                    <p class="mb-3 text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-600 lg:text-xs">Votre progression commence ici</p>
+                    <h1 class="max-w-xl text-3xl font-black leading-[1.08] tracking-tight text-[#1A2B48] lg:text-5xl xl:text-6xl">Libérez le potentiel de votre corps</h1>
+                    <p class="mt-4 max-w-xl text-sm leading-6 text-slate-500 lg:mt-6 lg:text-lg lg:leading-8">Suivez vos progrès, transformez vos habitudes et avancez chaque jour avec des outils simples et motivants.</p>
+                    <a href="{{ path('app_register') }}" class="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#10B981] px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 sm:w-auto lg:mt-8 lg:px-8 lg:py-4">
+                        Commencez votre aventure
+                        <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-5-5 5 5-5 5"/></svg>
+                    </a>
+                </div>
+                <div class="h-64 overflow-hidden rounded-3xl bg-emerald-50 shadow-sm lg:h-[430px] lg:rounded-[2rem]">
+                    <img src="{{ asset('img/hero.png') }}" alt="Deux sportifs illustrant leur progression avec FitProgress" class="h-full w-full object-cover object-center">
+                </div>
+            </section>
+
+            <section class="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-10 lg:py-16" aria-labelledby="tools-title">
+                <div class="mb-4 flex items-end justify-between gap-4">
+                    <div>
+                        <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-emerald-600">Au quotidien</p>
+                        <h2 id="tools-title" class="mt-1 text-xl font-black lg:text-3xl">Outils de précision</h2>
+                    </div>
+                    <span class="text-2xl text-emerald-500" aria-hidden="true">•••</span>
+                </div>
+
+                <div class="grid gap-3 sm:grid-cols-3 lg:gap-6">
+                    <article class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm lg:p-6">
+                        <div class="mb-3 flex size-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                            <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 5h14v14H5zM9 9a3 3 0 016 0M12 9l1.5-1.5"/></svg>
+                        </div>
+                        <h3 class="text-sm font-extrabold">Suivi du poids</h3>
+                        <p class="mt-1.5 text-xs leading-5 text-slate-500">Visualisez votre évolution et célébrez chaque étape.</p>
+                    </article>
+                    <article class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm lg:p-6">
+                        <div class="mb-3 flex size-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+                            <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 4h12v16H6zM9 8h6M9 12h6M9 16h3"/></svg>
+                        </div>
+                        <h3 class="text-sm font-extrabold">Journal quotidien</h3>
+                        <p class="mt-1.5 text-xs leading-5 text-slate-500">Notez vos habitudes pour mieux comprendre vos progrès.</p>
+                    </article>
+                    <article class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm lg:p-6">
+                        <div class="mb-3 flex size-9 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
+                            <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3a7 7 0 00-4 12.75V20l4-2 4 2v-4.25A7 7 0 0012 3zM9.5 10.5h.01m4.99 0h.01"/></svg>
+                        </div>
+                        <h3 class="text-sm font-extrabold">Coach & conseils</h3>
+                        <p class="mt-1.5 text-xs leading-5 text-slate-500">Recevez des recommandations adaptées à votre rythme.</p>
+                    </article>
+                </div>
+
+                <article class="mt-4 flex items-center justify-between gap-5 rounded-2xl bg-slate-950 p-5 text-white shadow-lg lg:mt-6 lg:p-7">
+                    <div>
+                        <p class="text-[9px] font-bold uppercase tracking-[0.18em] text-emerald-400">Pro Analytics</p>
+                        <h3 class="mt-1 text-base font-extrabold">Comprenez chaque tendance</h3>
+                        <p class="mt-1 text-xs leading-5 text-slate-400">Des indicateurs avancés pour guider vos prochaines décisions.</p>
+                    </div>
+                    <button type="button" class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-emerald-500 text-slate-950" aria-label="Aperçu graphique de démonstration">
+                        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 19V9m5 10V5m5 14v-7m4 7H3"/></svg>
+                    </button>
+                </article>
+            </section>
+
+            <section class="bg-slate-50 px-5 py-8 sm:px-8 lg:py-16" aria-labelledby="data-title">
+              <div class="mx-auto grid max-w-7xl items-center gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16 lg:px-2">
+               <div>
+                <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-emerald-600">Vos progrès en clair</p>
+                <h2 id="data-title" class="mt-1 text-xl font-black leading-tight lg:text-3xl">Des données fiables,<br>des décisions éclairées</h2>
+                <p class="mt-3 max-w-lg text-xs leading-5 text-slate-500 lg:text-sm lg:leading-6">Une lecture simple de vos tendances pour rester concentré sur ce qui compte vraiment.</p>
+               </div>
+
+                <div class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm lg:p-6" role="img" aria-label="Graphique statique de démonstration montrant une progression régulière">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400">Progression hebdomadaire</span>
+                        <span class="rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-extrabold text-emerald-600">+2,4%</span>
+                    </div>
+                    <div class="mt-5 flex h-28 items-end gap-2 border-b border-slate-100 px-1">
+                        <span class="h-[35%] flex-1 rounded-t-lg bg-emerald-100"></span>
+                        <span class="h-[48%] flex-1 rounded-t-lg bg-emerald-200"></span>
+                        <span class="h-[42%] flex-1 rounded-t-lg bg-emerald-100"></span>
+                        <span class="h-[68%] flex-1 rounded-t-lg bg-emerald-400"></span>
+                        <span class="h-[61%] flex-1 rounded-t-lg bg-emerald-200"></span>
+                        <span class="h-[82%] flex-1 rounded-t-lg bg-emerald-600"></span>
+                    </div>
+                    <div class="mt-2 flex justify-between text-[9px] text-slate-400"><span>Lun.</span><span>Mer.</span><span>Ven.</span><span>Dim.</span></div>
+                </div>
+              </div>
+            </section>
+
+            <section class="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-10 lg:py-16" aria-labelledby="community-title">
+                <div class="mb-4 flex items-center justify-between gap-4">
+                    <h2 id="community-title" class="text-xl font-black lg:text-3xl">Succès de la Communauté</h2>
+                    <span class="rounded-full bg-slate-100 px-2 py-1 text-[9px] font-bold uppercase text-slate-500">Démo</span>
+                </div>
+                <div class="grid gap-3 sm:grid-cols-2 lg:gap-6">
+                    <figure class="rounded-2xl border border-slate-100 p-4 shadow-sm">
+                        <div class="text-xs tracking-wider text-amber-400" aria-label="5 étoiles">★★★★★</div>
+                        <blockquote class="mt-2 text-xs leading-5 text-slate-600">« FitProgress m’aide à garder le cap sans pression. Je vois enfin mes habitudes évoluer. »</blockquote>
+                        <figcaption class="mt-4 flex items-center gap-3">
+                            <span class="flex size-9 items-center justify-center rounded-full bg-emerald-100 text-xs font-black text-emerald-700">JB</span>
+                            <span><strong class="block text-xs">Jean</strong><span class="text-[9px] text-slate-400">Témoignage fictif</span></span>
+                        </figcaption>
+                    </figure>
+                    <figure class="rounded-2xl border border-slate-100 p-4 shadow-sm">
+                        <div class="text-xs tracking-wider text-amber-400" aria-label="5 étoiles">★★★★★</div>
+                        <blockquote class="mt-2 text-xs leading-5 text-slate-600">« Les graphiques sont clairs et les conseils rendent mes objectifs beaucoup plus accessibles. »</blockquote>
+                        <figcaption class="mt-4 flex items-center gap-3">
+                            <span class="flex size-9 items-center justify-center rounded-full bg-indigo-100 text-xs font-black text-indigo-700">CL</span>
+                            <span><strong class="block text-xs">Chloé</strong><span class="text-[9px] text-slate-400">Témoignage fictif</span></span>
+                        </figcaption>
+                    </figure>
+                </div>
+            </section>
+
+            <section class="mx-5 mb-8 rounded-3xl bg-emerald-900 px-5 py-7 text-center text-white shadow-xl shadow-emerald-900/15 sm:mx-8 lg:mx-auto lg:mb-16 lg:max-w-7xl lg:px-12 lg:py-12">
+                <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-300">Passez à l’action</p>
+                <h2 class="mt-2 text-2xl font-black">Prêt pour changer ta vie ?</h2>
+                <p class="mx-auto mt-2 max-w-xs text-xs leading-5 text-emerald-100/80">Votre prochaine victoire peut commencer aujourd’hui.</p>
+                <div class="mt-5 grid gap-2 sm:grid-cols-2">
+                    <a href="{{ path('app_register') }}" class="rounded-xl bg-white px-4 py-3 text-xs font-extrabold text-emerald-900 transition hover:bg-emerald-50">Commencer gratuitement</a>
+                    <span class="inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-600 px-4 py-3 text-xs font-bold text-white">
+                        <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M8 3h8a2 2 0 012 2v14a2 2 0 01-2 2H8a2 2 0 01-2-2V5a2 2 0 012-2zm3 15h2"/></svg>
+                        Télécharger l’app
+                    </span>
+                </div>
+            </section>
+        </main>
+
+        {% include 'components/_public_footer.html.twig' %}
+    </div>
+</div>
+{% endblock %}
