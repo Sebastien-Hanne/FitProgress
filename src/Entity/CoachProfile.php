@@ -60,6 +60,15 @@ class CoachProfile
     #[ORM\OneToMany(mappedBy: 'coachProfile', targetEntity: CoachRequest::class, orphanRemoval: true)]
     private Collection $coachRequests;
 
+    #[ORM\OneToMany(mappedBy: 'coachProfile', targetEntity: Conversation::class, orphanRemoval: true)]
+    private Collection $conversations;
+
+    #[ORM\OneToMany(mappedBy: 'coachProfile', targetEntity: Session::class, orphanRemoval: true)]
+    private Collection $sessions;
+
+    #[ORM\OneToMany(mappedBy: 'coachProfile', targetEntity: Feedback::class, orphanRemoval: true)]
+    private Collection $feedbacks;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -67,6 +76,9 @@ class CoachProfile
         // Initialisation obligatoire des collections
         $this->certificates = new ArrayCollection();
         $this->coachRequests = new ArrayCollection();
+        $this->conversations = new ArrayCollection();
+        $this->sessions = new ArrayCollection();
+        $this->feedbacks = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -244,6 +256,81 @@ class CoachProfile
             if ($coachRequest->getCoachProfile() === $this) {
                 $coachRequest->setCoachProfile(null);
             }
+        }
+
+        return $this;
+    }
+
+    /** @return Collection<int, Conversation> */
+    public function getConversations(): Collection
+    {
+        return $this->conversations;
+    }
+
+    public function addConversation(Conversation $conversation): static
+    {
+        if (!$this->conversations->contains($conversation)) {
+            $this->conversations->add($conversation);
+            $conversation->setCoachProfile($this);
+        }
+
+        return $this;
+    }
+
+    public function removeConversation(Conversation $conversation): static
+    {
+        if ($this->conversations->removeElement($conversation) && $conversation->getCoachProfile() === $this) {
+            $conversation->setCoachProfile(null);
+        }
+
+        return $this;
+    }
+
+    /** @return Collection<int, Session> */
+    public function getSessions(): Collection
+    {
+        return $this->sessions;
+    }
+
+    public function addSession(Session $session): static
+    {
+        if (!$this->sessions->contains($session)) {
+            $this->sessions->add($session);
+            $session->setCoachProfile($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSession(Session $session): static
+    {
+        if ($this->sessions->removeElement($session) && $session->getCoachProfile() === $this) {
+            $session->setCoachProfile(null);
+        }
+
+        return $this;
+    }
+
+    /** @return Collection<int, Feedback> */
+    public function getFeedbacks(): Collection
+    {
+        return $this->feedbacks;
+    }
+
+    public function addFeedback(Feedback $feedback): static
+    {
+        if (!$this->feedbacks->contains($feedback)) {
+            $this->feedbacks->add($feedback);
+            $feedback->setCoachProfile($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFeedback(Feedback $feedback): static
+    {
+        if ($this->feedbacks->removeElement($feedback) && $feedback->getCoachProfile() === $this) {
+            $feedback->setCoachProfile(null);
         }
 
         return $this;
