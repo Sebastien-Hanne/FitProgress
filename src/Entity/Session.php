@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Enum\SessionStatus;
 use App\Repository\SessionRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SessionRepository::class)]
@@ -54,10 +56,14 @@ class Session
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    #[ORM\OneToMany(mappedBy: 'session', targetEntity: Feedback::class)]
+    private Collection $feedbacks;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
+        $this->feedbacks = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -156,5 +162,30 @@ class Session
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
         return $this->updatedAt;
+    }
+
+    /** @return Collection<int, Feedback> */
+    public function getFeedbacks(): Collection
+    {
+        return $this->feedbacks;
+    }
+
+    public function addFeedback(Feedback $feedback): static
+    {
+        if (!$this->feedbacks->contains($feedback)) {
+            $this->feedbacks->add($feedback);
+            $feedback->setSession($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFeedback(Feedback $feedback): static
+    {
+        if ($this->feedbacks->removeElement($feedback) && $feedback->getSession() === $this) {
+            $feedback->setSession(null);
+        }
+
+        return $this;
     }
 }
