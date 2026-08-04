@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Enum\MealType;
 use App\Repository\MealRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MealRepository::class)]
 class Meal
@@ -28,9 +29,13 @@ class Meal
     private MealType $type;
 
     #[ORM\Column(length: 150)]
+    #[Assert\NotBlank(message: 'Donnez un nom au repas.')]
+    #[Assert\Length(max: 150)]
     private ?string $title = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\PositiveOrZero(message: 'Les calories ne peuvent pas être négatives.')]
+    #[Assert\LessThanOrEqual(10000, message: 'Le nombre de calories est trop élevé.')]
     private ?int $calories = null;
 
     #[ORM\Column]

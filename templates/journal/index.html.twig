@@ -1,0 +1,188 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Journal quotidien | FitProgress{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="module" src="{{ asset('journal_page.js') }}" data-turbo-track="reload"></script>
+{% endblock %}
+
+{% block body %}
+{% set frenchDays = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'] %}
+{% set frenchMonths = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'] %}
+{% set hydrationValue = entry.waterIntakeMl|default(0) %}
+{% set hydrationPercent = hydrationValue >= hydrationGoal ? 100 : (hydrationValue / hydrationGoal * 100) %}
+<div class="fit-page min-h-screen font-sans text-[#1A2B48]" style="background-color:#f7f9fc">
+  <div class="journal-shell pb-24">
+    <header class="border-b border-slate-100 bg-white">
+        <div class="flex items-center justify-between px-4 py-3">
+            <a href="{{ path('app_home') }}" class="flex items-center gap-2" aria-label="FitProgress, accueil">
+                <span class="flex items-center justify-center overflow-hidden rounded-lg bg-emerald-50" style="display:flex;width:3rem;height:3rem;align-items:center;justify-content:center;overflow:hidden"><img src="{{ asset('img/logo.png') }}" alt="" style="display:block;width:3rem;height:3rem;object-fit:cover"></span>
+                <strong class="text-xl font-black">FitProgress</strong>
+            </a>
+            <div class="flex items-center gap-3">
+                <span class="flex items-center justify-center rounded-full bg-amber-100 text-sm font-black text-amber-800" style="display:flex;width:2.75rem;height:2.75rem;align-items:center;justify-content:center;border-radius:9999px;background:#fef3c7;color:#92400e" aria-label="Avatar de {{ app.user.name }}">{{ app.user.name|first|upper }}</span>
+                <span class="flex size-11 items-center justify-center rounded-full bg-slate-50" aria-label="Notifications"><svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17H9m9-2V9a6 6 0 10-12 0v6l-2 2h16l-2-2zM10 21h4"/></svg></span>
+            </div>
+        </div>
+    </header>
+
+    <main class="journal-main px-4 py-5">
+        <div class="mb-5 flex items-center justify-between gap-4">
+            <h1 class="text-xl font-black lg:text-3xl">{{ editing|default(false) ? 'Modifier le journal' : 'Journal Quotidien' }}</h1>
+            <strong class="text-[10px] lg:text-xs">{{ frenchMonths[entry.date|date('n') - 1]|capitalize }} {{ entry.date|date('Y') }}</strong>
+        </div>
+
+        <div class="journal-day-strip mb-6" aria-label="Jours autour de la date sélectionnée">
+            {% for offset in -1..3 %}
+                {% set day = entry.date|date_modify((offset >= 0 ? '+' : '') ~ offset ~ ' day') %}
+                <div class="journal-day {{ offset == 0 ? 'is-today' : '' }}">
+                    <span>{{ frenchDays[day|date('N') - 1]|slice(0, 3) }}</span>
+                    <strong>{{ day|date('d') }}</strong>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% for message in app.flashes('success') %}
+            <div class="mb-4 rounded-2xl bg-emerald-50 p-4 text-xs font-semibold text-emerald-800">{{ message }}</div>
+        {% endfor %}
+
+        {{ form_start(form, {attr: {'data-journal-page': '', 'data-journal-meals-index-value': form.meals|length, 'data-hydration-goal': hydrationGoal, class: 'journal-form grid gap-4'}}) }}
+            {{ form_errors(form) }}
+
+            <section class="journal-half journal-card p-4 lg:p-6" aria-labelledby="mood-title">
+                <h2 id="mood-title" class="text-[11px] font-black uppercase tracking-wide">Humeur actuelle</h2>
+                <div class="journal-choice-grid journal-mood-grid mt-4">
+                    {% set moodIcons = {'very_bad': '😣', 'bad': '☹️', 'stable': '😐', 'good': '🙂', 'excellent': '😄'} %}
+                    {% for choice in form.mood %}
+                        {% if choice.vars.value != '' %}
+                        <div>
+                            {{ form_widget(choice) }}
+                            <label for="{{ choice.vars.id }}">
+                                <span class="journal-mood-icon" aria-hidden="true">{{ moodIcons[choice.vars.value]|default('🙂') }}</span>
+                                <span>{{ choice.vars.label }}</span>
+                            </label>
+                        </div>
+                        {% else %}
+                            {{ form_widget(choice, {attr: {style: 'display:none'}}) }}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                {{ form_errors(form.mood) }}
+            </section>
+
+            <section class="journal-half journal-card p-4 lg:p-6" aria-labelledby="energy-title">
+                <h2 id="energy-title" class="text-[11px] font-black uppercase tracking-wide">Niveau d’énergie</h2>
+                <div class="journal-choice-grid journal-energy-grid mt-3 items-end">
+                    {% for choice in form.energyLevel %}
+                        {% if choice.vars.value != '' %}
+                            <div>{{ form_widget(choice) }}{{ form_label(choice) }}</div>
+                        {% else %}
+                            {{ form_widget(choice, {attr: {style: 'display:none'}}) }}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <p class="mt-2 text-center text-sm font-black" data-energy-status>Concentré</p>
+                {{ form_errors(form.energyLevel) }}
+            </section>
+
+            <section class="journal-span-full journal-card p-5 lg:p-6" aria-labelledby="nutrition-title">
+                <div class="flex items-center justify-between gap-4">
+                    <div>
+                        <h2 id="nutrition-title" class="text-xl font-black">Nutrition</h2>
+                    </div>
+                    <strong class="text-[10px] text-emerald-800"><span data-journal-meals-target="total">{{ entry.totalCalories }}</span> kcal</strong>
+                </div>
+
+                {% set mealPrototype %}{% include 'journal/_meal_form.html.twig' with {mealForm: form.meals.vars.prototype} %}{% endset %}
+                <div class="mt-4 grid gap-3" data-journal-meals-target="container" data-prototype="{{ mealPrototype|e('html_attr') }}">
+                    {% for mealForm in form.meals %}
+                        {% include 'journal/_meal_form.html.twig' with {mealForm: mealForm} %}
+                    {% endfor %}
+                </div>
+                <button type="button" class="mt-3 px-1 py-2 text-xs text-emerald-700 transition hover:text-emerald-900" data-journal-add-meal>⊕ Ajouter un repas</button>
+            </section>
+
+            <section class="journal-third journal-card p-4 lg:p-6" aria-labelledby="activity-title">
+                <h2 id="activity-title" class="text-[11px] font-black uppercase tracking-wide text-emerald-900">⚒ Activité physique</h2>
+                <div class="mt-3 flex items-center justify-between gap-4">
+                    <div>
+                        {{ form_widget(form.activityMinutes, {attr: {class: 'journal-activity-input', placeholder: '0', 'data-journal-activity': ''}}) }}
+                        <span class="text-[10px] font-black uppercase">min</span>
+                        {{ form_errors(form.activityMinutes) }}
+                    </div>
+                    <span class="journal-activity-ring text-[9px] font-bold text-emerald-800" data-journal-activity-ring><span>ACTIF</span></span>
+                </div>
+            </section>
+
+            <section class="journal-third journal-card p-4 lg:p-6" aria-labelledby="sleep-title">
+                <h2 id="sleep-title" class="flex items-center gap-2 text-[11px] font-black uppercase tracking-wide"><span class="text-3xl font-normal leading-none text-indigo-600" style="font-size:2rem;color:#4b4ce1" aria-hidden="true">☾</span><span>Qualité du sommeil</span></h2>
+                <div class="mt-3 grid gap-2">
+                    <div>
+                        {{ form_widget(form.sleepHours, {attr: {class: 'w-full border-0 bg-transparent p-0 text-3xl font-black text-indigo-600', placeholder: '0.0'}}) }}
+                        <span class="text-[9px] font-bold uppercase">heures</span>
+                        {{ form_errors(form.sleepHours) }}
+                    </div>
+                    <div>
+                        <div class="journal-sleep-quality" data-sleep-quality>
+                            {% for choice in form.sleepQuality %}
+                                {% if choice.vars.value != '' %}
+                                    {{ form_widget(choice) }}{{ form_label(choice) }}
+                                {% else %}
+                                    {{ form_widget(choice, {attr: {style: 'display:none'}}) }}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        {{ form_errors(form.sleepQuality) }}
+                    </div>
+                </div>
+            </section>
+
+            <section class="journal-third journal-card overflow-hidden p-5 lg:p-6" aria-labelledby="hydration-title">
+                <div class="journal-hydration-layout">
+                    <div><h2 id="hydration-title" class="text-xl font-black">Hydratation</h2><p class="mt-1 text-[9px] font-bold">Objectif : {{ hydrationGoal|number_format(0, ',', ' ') }} ml</p></div>
+                    <button type="button" class="journal-round-button bg-indigo-50 text-indigo-600" style="background:#eef2ff;color:#4b4ce1" data-water-change="-100">−</button>
+                    <div class="w-24">
+                    {{ form_widget(form.waterIntakeMl, {attr: {class: 'journal-water-input', 'data-journal-water': ''}}) }}
+                    <p class="text-center text-[9px] font-bold text-indigo-600">ml</p>
+                    {{ form_errors(form.waterIntakeMl) }}
+                    </div>
+                    <button type="button" class="journal-round-button bg-indigo-600 text-white" style="background:#4b4ce1;color:#fff" data-water-change="100">+</button>
+                </div>
+                <div class="-mx-5 mt-4 h-1.5 bg-indigo-100"><div class="h-full bg-indigo-600" style="width:{{ hydrationPercent }}%" data-journal-water-progress></div></div>
+            </section>
+
+            <section class="journal-span-full journal-card p-5 text-center lg:p-7" aria-labelledby="weight-title">
+                <h2 id="weight-title" class="sr-only">Poids et IMC</h2>
+                <div class="mx-auto max-w-xs">
+                    {{ form_widget(form.weight, {attr: {class: 'journal-weight-input', placeholder: '0.0', 'data-journal-weight': ''}}) }}<span class="-ml-2 text-xl font-bold text-slate-500">kg</span>
+                    {{ form_errors(form.weight) }}
+                </div>
+                <div class="mx-auto mt-4 grid max-w-sm grid-cols-[auto_1fr_auto] items-center gap-2">
+                    <button type="button" class="flex size-9 items-center justify-center rounded-full bg-slate-100 text-xl font-black text-slate-600" data-weight-change="-0.1" aria-label="Diminuer le poids de 0,1 kg">‹</button>
+                    <div class="journal-weight-wheel"
+                         data-journal-weight-wheel
+                         role="slider" aria-label="Régler le poids : glisser à gauche ou à droite"></div>
+                    <button type="button" class="flex size-9 items-center justify-center rounded-full bg-slate-100 text-xl font-black text-slate-600" data-weight-change="0.1" aria-label="Augmenter le poids de 0,1 kg">›</button>
+                </div>
+                {% if entry.bmi %}<strong class="mt-3 inline-flex rounded-full bg-emerald-500 px-3 py-1.5 text-xs text-white">IMC {{ entry.bmi|number_format(1, ',', ' ') }}</strong>{% endif %}
+                {% if not hasHeight %}<p class="mt-3 rounded-xl bg-amber-50 p-3 text-[10px] leading-4 text-amber-800">Complétez votre taille dans votre profil pour calculer automatiquement l’IMC.</p>{% endif %}
+            </section>
+
+            <section class="journal-span-full" aria-labelledby="notes-title">
+                <h2 id="notes-title" class="mb-2 text-[11px] font-black uppercase tracking-wide">Réflexions</h2>
+                {{ form_widget(form.notes, {attr: {class: 'journal-notes'}}) }}
+                {{ form_errors(form.notes) }}
+            </section>
+
+            <div class="journal-span-full">
+                <button type="submit" class="mx-auto block w-full max-w-xs rounded-xl bg-[#00b887] px-8 py-5 text-base font-black uppercase tracking-wide text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-600" style="background-color:#00b887;color:#ffffff">Enregistrer</button>
+                {% if editing|default(false) %}<a href="{{ path('app_journal_history') }}" class="mt-2 flex w-full items-center justify-center rounded-xl px-5 py-3 text-xs font-bold text-slate-500">Annuler</a>{% endif %}
+            </div>
+        {{ form_end(form) }}
+    </main>
+
+    {% include 'components/_app_navigation.html.twig' with {active: 'journal', compact: true} %}
+  </div>
+</div>
+{% endblock %}

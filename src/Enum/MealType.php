@@ -7,4 +7,14 @@ enum MealType: string {
     case Lunch = 'lunch';
     case Dinner = 'dinner';
     case Snack = 'snack';
+
+    public function label(): string
+    {
+        return match ($this) {
+            self::Breakfast => 'Petit-déjeuner',
+            self::Lunch => 'Déjeuner',
+            self::Dinner => 'Dîner',
+            self::Snack => 'Collation',
+        };
+    }
 }
