@@ -1,0 +1,25 @@
+<div class="border-b border-dashed border-slate-200 py-3 last:border-0" data-meal-item>
+    {% set mealKind = mealForm.type.vars.data ? mealForm.type.vars.data.value : 'breakfast' %}
+    {% set mealIcons = {'breakfast': '🍞', 'lunch': '🍔', 'dinner': '🍽️', 'snack': '🍎'} %}
+    <div class="journal-meal-fields">
+        <span class="journal-meal-icon" data-meal-type-icon aria-hidden="true">{{ mealIcons[mealKind]|default('🍽️') }}</span>
+        <div class="min-w-0">
+            <div class="journal-meal-type">
+                {{ form_label(mealForm.type, null, {label_attr: {class: 'sr-only'}}) }}
+                {{ form_widget(mealForm.type, {attr: {'data-meal-type-select': ''}}) }}
+                {{ form_errors(mealForm.type) }}
+            </div>
+            <div class="journal-meal-title">
+                {{ form_label(mealForm.title, null, {label_attr: {class: 'sr-only'}}) }}
+                {{ form_widget(mealForm.title) }}
+                {{ form_errors(mealForm.title) }}
+            </div>
+        </div>
+        <div class="journal-meal-calories">
+            {{ form_label(mealForm.calories, null, {label_attr: {class: 'sr-only'}}) }}
+            <div class="journal-meal-calories-line">{{ form_widget(mealForm.calories) }}<span class="text-[9px] font-bold">kcal</span></div>
+            {{ form_errors(mealForm.calories) }}
+        </div>
+        <button type="button" class="journal-meal-remove" data-journal-remove-meal aria-label="Supprimer ce repas">×</button>
+    </div>
+</div>

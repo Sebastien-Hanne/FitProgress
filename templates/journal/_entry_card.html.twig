@@ -1,0 +1,24 @@
+<article class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div class="flex items-start justify-between gap-4">
+        <div>
+            <time class="text-sm font-black" datetime="{{ entry.date|date('Y-m-d') }}">{{ entry.date|date('d/m/Y') }}</time>
+            <p class="mt-1 text-[10px] text-slate-400">{{ entry.meals|length }} repas · {{ entry.totalCalories }} kcal</p>
+        </div>
+        <div class="flex gap-2">
+            {% if entry.date|date('Y-m-d') == today|date('Y-m-d') %}
+                <a href="{{ path('app_journal_edit', {id: entry.id}) }}" class="rounded-lg bg-slate-100 px-3 py-2 text-[10px] font-bold text-slate-700 transition hover:bg-slate-200">Modifier</a>
+            {% endif %}
+            <form method="post" action="{{ path('app_journal_delete', {id: entry.id}) }}" onsubmit="return confirm('Supprimer définitivement cette entrée ?');">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete-journal-' ~ entry.id) }}">
+                <button type="submit" class="rounded-lg bg-rose-50 px-3 py-2 text-[10px] font-bold text-rose-700 transition hover:bg-rose-100">Supprimer</button>
+            </form>
+        </div>
+    </div>
+    <dl class="mt-4 grid grid-cols-2 gap-3 text-xs sm:grid-cols-5">
+        <div class="rounded-xl bg-slate-50 p-3"><dt class="text-[9px] uppercase text-slate-400">Poids</dt><dd class="mt-1 font-extrabold">{{ entry.weight ? entry.weight|number_format(1, ',', ' ') ~ ' kg' : '—' }}</dd></div>
+        <div class="rounded-xl bg-slate-50 p-3"><dt class="text-[9px] uppercase text-slate-400">IMC</dt><dd class="mt-1 font-extrabold">{{ entry.bmi ? entry.bmi|number_format(1, ',', ' ') : '—' }}</dd></div>
+        <div class="rounded-xl bg-slate-50 p-3"><dt class="text-[9px] uppercase text-slate-400">Eau</dt><dd class="mt-1 font-extrabold">{{ entry.waterIntakeMl ? entry.waterIntakeMl ~ ' ml' : '—' }}</dd></div>
+        <div class="rounded-xl bg-slate-50 p-3"><dt class="text-[9px] uppercase text-slate-400">Activité</dt><dd class="mt-1 font-extrabold">{{ entry.activityMinutes is not null ? entry.activityMinutes ~ ' min' : '—' }}</dd></div>
+        <div class="rounded-xl bg-slate-50 p-3"><dt class="text-[9px] uppercase text-slate-400">Sommeil</dt><dd class="mt-1 font-extrabold">{{ entry.sleepHours ? entry.sleepHours|number_format(1, ',', ' ') ~ ' h' : '—' }}</dd></div>
+    </dl>
+</article>

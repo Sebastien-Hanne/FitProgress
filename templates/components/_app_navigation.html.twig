@@ -1,16 +1,16 @@
 {% set activeItem = active|default('dashboard') %}
 {% set items = [
-    ['dashboard', 'Dashboard', 'M4 13h6V4H4v9zm0 7h6v-4H4v4zm10 0h6v-9h-6v9zm0-16v4h6V4h-6z'],
-    ['journal', 'Journal', 'M12 6.25v13m0-13C10.9 5.5 9.4 5 7.75 5S4.6 5.5 3.5 6.25v13C4.6 18.5 6.1 18 7.75 18s3.15.5 4.25 1.25m0-13C13.1 5.5 14.6 5 16.25 5s3.15.5 4.25 1.25v13C19.4 18.5 17.9 18 16.25 18S13.1 18.5 12 19.25'],
-    ['history', 'Historique', 'M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8m0-5v5h5m4-1v5l3 2'],
-    ['target', 'Cible', 'M12 21a9 9 0 100-18 9 9 0 000 18zm0-4.5a4.5 4.5 0 100-9 4.5 4.5 0 000 9zm0-2.5a2 2 0 100-4 2 2 0 000 4z'],
-    ['profile', 'Profil', 'M15.75 7.5a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 21a7.5 7.5 0 0115 0']
+    ['dashboard', 'Dashboard', 'M4 13h6V4H4v9zm0 7h6v-4H4v4zm10 0h6v-9h-6v9zm0-16v4h6V4h-6z', 'dashboard'],
+    ['journal', 'Journal', 'M12 6.25v13m0-13C10.9 5.5 9.4 5 7.75 5S4.6 5.5 3.5 6.25v13C4.6 18.5 6.1 18 7.75 18s3.15.5 4.25 1.25m0-13C13.1 5.5 14.6 5 16.25 5s3.15.5 4.25 1.25v13C19.4 18.5 17.9 18 16.25 18S13.1 18.5 12 19.25', 'app_journal_today'],
+    ['history', 'Historique', 'M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8m0-5v5h5m4-1v5l3 2', 'app_journal_history'],
+    ['target', 'Cible', 'M12 21a9 9 0 100-18 9 9 0 000 18zm0-4.5a4.5 4.5 0 100-9 4.5 4.5 0 000 9zm0-2.5a2 2 0 100-4 2 2 0 000 4z', null],
+    ['profile', 'Profil', 'M15.75 7.5a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 21a7.5 7.5 0 0115 0', null]
 ] %}
 
-<nav class="app-navigation fixed bottom-0 left-0 z-20 grid w-full grid-cols-5 border-t border-slate-200 bg-white px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-5px_20px_rgba(15,23,42,0.06)]" aria-label="Navigation principale">
+<nav class="app-navigation {{ compact|default(false) ? 'is-compact' : '' }} fixed bottom-0 left-0 z-20 grid w-full grid-cols-5 border-t border-slate-200 bg-white px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-5px_20px_rgba(15,23,42,0.06)]" aria-label="Navigation principale">
     {% for item in items %}
-        {% if item[0] == 'dashboard' %}
-            <a href="{{ path('dashboard') }}" class="app-nav-item {{ activeItem == item[0] ? 'is-active' : '' }}" {% if activeItem == item[0] %}aria-current="page"{% endif %}>
+        {% if item[3] %}
+            <a href="{{ path(item[3]) }}" class="app-nav-item {{ activeItem == item[0] ? 'is-active' : '' }}" {% if activeItem == item[0] %}aria-current="page"{% endif %}>
                 <span class="app-nav-icon">
                     <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="{{ item[2] }}"/></svg>
                 </span>

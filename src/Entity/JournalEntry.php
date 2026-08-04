@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: JournalEntryRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -36,16 +37,25 @@ class JournalEntry
     private ?\DateTimeImmutable $date = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2, nullable: true)]
+    #[Assert\Positive(message: 'Le poids doit être supérieur à zéro.')]
+    #[Assert\LessThanOrEqual(500, message: 'Le poids renseigné est trop élevé.')]
     private ?string $weight = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 4, scale: 2, nullable: true)]
     private ?string $bmi = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\PositiveOrZero(message: 'L’hydratation ne peut pas être négative.')]
+    #[Assert\LessThanOrEqual(20000, message: 'L’hydratation renseignée est trop élevée.')]
     private ?int $waterIntakeMl = null;
 
     #[ORM\Column(nullable: true)]
     private ?int $steps = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Assert\PositiveOrZero(message: 'La durée d’activité ne peut pas être négative.')]
+    #[Assert\LessThanOrEqual(1440, message: 'La durée d’activité ne peut pas dépasser une journée.')]
+    private ?int $activityMinutes = null;
 
     #[ORM\Column(
         type: 'smallint',
@@ -62,9 +72,12 @@ class JournalEntry
     private ?Mood $mood = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 4, scale: 2, nullable: true)]
+    #[Assert\PositiveOrZero(message: 'La durée de sommeil ne peut pas être négative.')]
+    #[Assert\LessThanOrEqual(24, message: 'La durée de sommeil ne peut pas dépasser 24 heures.')]
     private ?string $sleepHours = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
+    #[Assert\Range(min: 1, max: 5, notInRangeMessage: 'La qualité du sommeil doit être comprise entre 1 et 5.')]
     private ?int $sleepQuality = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -157,6 +170,24 @@ class JournalEntry
         return $this;
     }
 
+    public function recalculateBmi(?int $heightCm): void
+    {
+        if ($this->weight === null || $heightCm === null || $heightCm <= 0) {
+            $this->bmi = null;
+            return;
+        }
+
+        $heightMeters = $heightCm / 100;
+        $this->bmi = number_format((float) $this->weight / ($heightMeters ** 2), 2, '.', '');
+    }
+
+    public function getTotalCalories(): int
+    {
+        return array_sum($this->meals->map(
+            static fn (Meal $meal): int => $meal->getCalories() ?? 0
+        )->toArray());
+    }
+
     public function getWaterIntakeMl(): ?int
     {
         return $this->waterIntakeMl;
@@ -176,6 +207,17 @@ class JournalEntry
     public function setSteps(?int $steps): static
     {
         $this->steps = $steps;
+        return $this;
+    }
+
+    public function getActivityMinutes(): ?int
+    {
+        return $this->activityMinutes;
+    }
+
+    public function setActivityMinutes(?int $activityMinutes): static
+    {
+        $this->activityMinutes = $activityMinutes;
         return $this;
     }
 

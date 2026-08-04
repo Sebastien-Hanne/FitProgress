@@ -9,4 +9,15 @@ enum Mood: string
     case Stable = 'stable';
     case Good = 'good';
     case Excellent = 'excellent';
+
+    public function label(): string
+    {
+        return match ($this) {
+            self::VeryBad => 'Très mauvaise',
+            self::Bad => 'Mauvaise',
+            self::Stable => 'Stable',
+            self::Good => 'Bonne',
+            self::Excellent => 'Excellente',
+        };
+    }
 }
