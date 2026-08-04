@@ -1,3 +1,43 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Palette officielle FitProgress — source unique pour toutes les pages. */
+:root {
+    --fit-navy: #1a2b48;
+    --fit-action-blue: #1769aa;
+    --fit-feedback: #494be8;
+    --fit-success: #00b887;
+    --fit-success-dark: #008567;
+    --fit-page: #f7f9fc;
+    --fit-alert-bg: #ffe3e1;
+    --fit-alert-text: #dc5d58;
+    --fit-border: #d7e0ea;
+}
+
+body {
+    background-color: var(--fit-page);
+    color: var(--fit-navy);
+}
+
+@layer components {
+    .fit-text { color: var(--fit-navy); }
+    .fit-page { background-color: var(--fit-page); }
+    .fit-success-bg { background-color: var(--fit-success); }
+    .fit-success-text { color: var(--fit-success-dark); }
+    .fit-feedback-card { background-color: var(--fit-feedback); }
+    .fit-alert {
+        border-color: #ffc9c5;
+        background-color: var(--fit-alert-bg);
+        color: var(--fit-alert-text);
+    }
+    .fit-action-button {
+        background-color: var(--fit-action-blue);
+        color: #fff;
+    }
+    .fit-action-button:hover { background-color: #125a94; }
+    .fit-action-button:focus-visible {
+        outline: 3px solid color-mix(in srgb, var(--fit-success) 45%, transparent);
+        outline-offset: 2px;
+    }
+}

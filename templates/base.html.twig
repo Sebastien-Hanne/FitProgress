@@ -7,6 +7,106 @@
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
         {% block stylesheets %}
         {% endblock %}
+        <style>
+            :root {
+                --fit-navy: #1a2b48;
+                --fit-action-blue: #1769aa;
+                --fit-feedback: #494be8;
+                --fit-success: #00b887;
+                --fit-success-dark: #008567;
+                --fit-page: #f7f9fc;
+                --fit-alert-bg: #ffe3e1;
+                --fit-alert-text: #dc5d58;
+            }
+            body { color: var(--fit-navy); }
+            .fit-text { color: var(--fit-navy) !important; }
+            .fit-page { background-color: var(--fit-page) !important; }
+            .fit-success-bg { background-color: var(--fit-success) !important; }
+            .fit-success-text { color: var(--fit-success-dark) !important; }
+            .fit-feedback-card { background-color: var(--fit-feedback) !important; }
+            .fit-alert {
+                border-color: #ffc9c5 !important;
+                background-color: var(--fit-alert-bg) !important;
+                color: var(--fit-alert-text) !important;
+            }
+            .fit-action-button {
+                display: flex !important;
+                background-color: var(--fit-action-blue) !important;
+                color: #fff !important;
+            }
+            .fit-action-button:hover { background-color: #125a94 !important; }
+            .fit-action-button:focus-visible {
+                outline: 3px solid rgba(0, 184, 135, .45) !important;
+                outline-offset: 2px;
+            }
+            .fit-period-active {
+                background-color: var(--fit-success) !important;
+                color: #fff !important;
+                box-shadow: 0 2px 8px rgba(0, 184, 135, .22);
+            }
+            .app-navigation {
+                display: grid !important;
+                grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+                align-items: center;
+                min-height: 4.5rem;
+            }
+            .app-nav-item {
+                display: flex !important;
+                min-width: 0;
+                flex-direction: column !important;
+                align-items: center !important;
+                justify-content: center !important;
+                gap: .2rem;
+                padding: .55rem .2rem;
+                border: 0;
+                border-radius: 9999px;
+                background: transparent;
+                color: #1a2b48;
+                text-decoration: none;
+            }
+            .app-nav-item.is-active {
+                background-color: var(--fit-success) !important;
+                color: #fff !important;
+                box-shadow: 0 4px 12px rgba(0, 184, 135, .24);
+            }
+            .app-nav-icon {
+                display: flex !important;
+                width: 1.65rem;
+                height: 1.65rem;
+                align-items: center !important;
+                justify-content: center !important;
+            }
+            .app-nav-label {
+                display: block;
+                font-size: .48rem;
+                font-weight: 800;
+                line-height: 1;
+                text-transform: uppercase;
+                white-space: nowrap;
+            }
+            @media (min-width: 1024px) {
+                .dashboard-grid {
+                    display: grid !important;
+                    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+                }
+                .dashboard-full { grid-column: span 12 / span 12 !important; }
+                .dashboard-weight { grid-column: span 5 / span 5 !important; }
+                .dashboard-bmi { grid-column: span 7 / span 7 !important; }
+                .dashboard-chart { grid-column: span 8 / span 8 !important; }
+                .dashboard-feedback { grid-column: span 4 / span 4 !important; }
+                .dashboard-actions { grid-column: span 4 / span 4 !important; }
+                .dashboard-stat-card { min-height: 12rem; padding: 1.5rem !important; }
+                .app-navigation {
+                    left: 50% !important;
+                    width: min(44rem, calc(100% - 3rem)) !important;
+                    transform: translateX(-50%) !important;
+                    border-left: 1px solid #e2e8f0;
+                    border-right: 1px solid #e2e8f0;
+                    border-radius: 1rem 1rem 0 0;
+                }
+                .app-nav-label { font-size: .58rem; }
+            }
+        </style>
 
         {% block javascripts %}
             {% block importmap %}{{ importmap('app') }}{% endblock %}
