@@ -13,26 +13,7 @@
     data-weights="{{ dashboard.weightHistory.values|json_encode|e('html_attr') }}"
 >
     <div class="fit-page min-h-screen w-full">
-        <header class="border-b border-slate-100 bg-white" aria-label="En-tête du dashboard">
-          <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-10 lg:py-4">
-            <a href="{{ path('app_home') }}" class="flex min-w-0 items-center gap-2 rounded-lg outline-none transition hover:opacity-80 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2" aria-label="FitProgress, retour à l’accueil">
-                <span class="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-emerald-50">
-                    <img src="{{ asset('img/logo.png') }}" alt="" class="h-8 w-8 scale-[2.4] object-cover object-center">
-                </span>
-                <span class="truncate text-sm font-black tracking-tight lg:text-base">FitProgress</span>
-            </a>
-
-            <div class="flex items-center gap-2.5">
-                <span class="flex h-8 w-8 items-center justify-center rounded-full text-[11px] font-black" style="display:flex;width:2rem;height:2rem;align-items:center;justify-content:center;border-radius:9999px;background-color:#00b887;color:#ffffff;box-shadow:0 3px 10px rgba(0,184,135,.22)" aria-label="Avatar de {{ app.user ? app.user.name : 'l’utilisateur' }}">
-                    {{ app.user and app.user.name ? app.user.name|first|upper : 'U' }}
-                </span>
-                <button type="button" class="relative flex h-8 w-8 items-center justify-center rounded-full bg-slate-50 text-[#1A2B48] transition hover:bg-emerald-50 hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500" aria-label="Ouvrir les notifications" data-action="dashboard-actions#open" data-action-name="notifications" data-title="Notifications" data-content="Pensez à vous peser : aucune pesée n’a été enregistrée depuis 5 jours.">
-                    <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17H9m9-2V9a6 6 0 10-12 0v6l-2 2h16l-2-2zM10 21h4"/></svg>
-                    <span class="absolute right-1 top-1 size-2 rounded-full border-2 border-white bg-emerald-500" data-dashboard-actions-target="notificationDot"></span>
-                </button>
-            </div>
-          </div>
-        </header>
+        {% include 'components/_app_header.html.twig' with {notificationInteractive: true} %}
 
         <main class="dashboard-grid mx-auto grid max-w-7xl gap-4 px-4 pb-24 pt-4 sm:px-6 lg:grid-cols-12 lg:gap-6 lg:px-10 lg:pb-32 lg:pt-10">
             <section class="dashboard-full hidden lg:col-span-12 lg:block lg:pb-2" aria-labelledby="dashboard-title">

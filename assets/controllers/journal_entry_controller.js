@@ -42,7 +42,7 @@ export default class extends Controller {
         if (this.dragStartX === undefined) return;
 
         const steps = Math.trunc((event.clientX - this.dragStartX) / 12);
-        this.setWeight(this.dragStartWeight + steps * 0.1);
+        this.setWeight(this.dragStartWeight - steps * 0.1);
     }
 
     stopWeightDrag() {
@@ -52,7 +52,10 @@ export default class extends Controller {
 
     adjustWeight(event) {
         event.preventDefault();
-        this.changeWeight(event.deltaY < 0 || event.deltaX > 0 ? 0.1 : -0.1);
+        const increase = Math.abs(event.deltaX) > Math.abs(event.deltaY)
+            ? event.deltaX < 0
+            : event.deltaY < 0;
+        this.changeWeight(increase ? 0.1 : -0.1);
     }
 
     changeWeight(amount) {
