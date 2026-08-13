@@ -3,6 +3,7 @@
 namespace App\Tests\Security;
 
 use App\Entity\JournalEntry;
+use App\Entity\Goal;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -25,6 +26,8 @@ final class JournalEntryAccessTest extends WebTestCase
 
         $entityManager->persist($userA);
         $entityManager->persist($userB);
+        $entityManager->persist($userA->getGoal());
+        $entityManager->persist($userB->getGoal());
         $entityManager->persist($entry);
         $entityManager->flush();
 
@@ -61,12 +64,21 @@ final class JournalEntryAccessTest extends WebTestCase
 
     private function createUser(string $email): User
     {
-        return (new User())
+        $user = (new User())
             ->setEmail($email)
             ->setProxyEmail('proxy-'.$email)
             ->setName($email)
             ->setPassword('not-used-by-loginUser')
             ->setRoles(['ROLE_USER']);
+        $goal = (new Goal())
+            ->setUser($user)
+            ->setHeightCm(175)
+            ->setInitialWeight('80.0')
+            ->setTargetWeight('72.0')
+            ->setBirthDate(new \DateTimeImmutable('1992-01-01'));
+        $user->setGoal($goal);
+
+        return $user;
     }
 
     private function assertEntryIsUnchanged(int $entryId, int $userAId, string $suffix): void

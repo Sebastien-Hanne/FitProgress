@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Notifications | FitProgress{% endblock %}
+
+{% block stylesheets %}<style>
+    .notifications-main { width: 100%; max-width: 64rem; margin-inline: auto; padding: 2rem 1rem 9rem; }
+    .notification-card { display: flex; gap: 1rem; border: 1px solid #e2e8f0; border-radius: 1rem; background: #fff; padding: 1rem; box-shadow: 0 2px 5px rgba(15,23,42,.04); }
+    .notification-card.is-unread { border-left: 4px solid #00b887; background: #f0fdf9; }
+    .notification-icon { display: flex; width: 2.5rem; height: 2.5rem; flex: 0 0 2.5rem; align-items: center; justify-content: center; border-radius: 999px; background: #dff7ef; color: #008567; }
+    .notifications-list { display: grid; gap: 1rem; margin-top: 2rem; }
+</style>{% endblock %}
+
+{% block body %}
+<div class="fit-page fit-text min-h-screen font-sans">
+    {% include 'components/_app_header.html.twig' %}
+    <main class="notifications-main">
+        <a href="{{ path('app_profile') }}" class="inline-flex items-center gap-2 text-lg font-black text-emerald-700">← Retour au profil</a>
+        <div class="mt-8 flex items-end justify-between gap-4"><div><p class="text-[10px] font-black uppercase tracking-widest text-emerald-600">Votre activité</p><h1 class="mt-2 text-3xl font-black">Notifications</h1></div>{% if notifications|filter(n => not n.read)|length %}<form method="post" action="{{ path('app_notifications_read_all') }}"><input type="hidden" name="_token" value="{{ csrf_token('notifications-read-all') }}"><button class="rounded-xl bg-emerald-500 px-4 py-3 text-xs font-bold text-white">Tout marquer comme lu</button></form>{% endif %}</div>
+        <div class="notifications-list">
+            {% for notification in notifications %}
+                <article class="notification-card {{ notification.read ? '' : 'is-unread' }}"><span class="notification-icon">{{ notification.read ? '✓' : '●' }}</span><div class="min-w-0"><h2 class="text-sm font-black">{{ notification.title }}</h2><p class="mt-1 text-xs leading-5 text-slate-600">{{ notification.content }}</p><time class="mt-2 block text-[9px] text-slate-400" datetime="{{ notification.createdAt|date('c') }}">{{ notification.createdAt|date('d/m/Y à H:i') }}</time></div></article>
+            {% else %}
+                <p class="rounded-2xl border border-slate-200 bg-white p-10 text-center text-sm text-slate-500">Vous n’avez aucune notification pour le moment.</p>
+            {% endfor %}
+        </div>
+    </main>
+    {% include 'components/_app_navigation.html.twig' with {active: 'profile'} %}
+</div>
+{% endblock %}

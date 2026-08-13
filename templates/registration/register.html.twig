@@ -128,7 +128,7 @@
                         }
                     }) }}
                     <label for="{{ registrationForm.agreeTerms.vars.id }}" class="text-[10px] text-slate-600 leading-tight cursor-pointer">
-                        J'accepte les <a href="#" class="text-emerald-700 font-bold hover:underline">conditions d'utilisation</a> et la <a href="#" class="text-emerald-700 font-bold hover:underline">politique de confidentialité</a>.
+                        J'accepte les <a href="{{ path('app_legal_terms') }}" target="_blank" rel="noopener" class="text-emerald-700 font-bold hover:underline">conditions d'utilisation</a> et j’ai lu la <a href="{{ path('app_legal_privacy') }}" target="_blank" rel="noopener" class="text-emerald-700 font-bold hover:underline">politique de confidentialité</a>.
                     </label>
                 </div>
                 <div class="text-[10px] text-red-500 mt-0.5 min-h-[1rem]">{{ form_errors(registrationForm.agreeTerms) }}</div>

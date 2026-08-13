@@ -1,0 +1,111 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon profil | FitProgress{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        .profile-shell { width: 100%; min-height: 100vh; }
+        .profile-page .app-header { width: 100%; margin-left: 0; }
+        .profile-main { padding-bottom: 0 !important; }
+        .profile-identity { padding-top: 2rem !important; }
+        .profile-physical { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .profile-avatar { display: flex; width: 5rem; height: 5rem; margin-inline: auto; flex: 0 0 5rem; align-items: center; justify-content: center; overflow: hidden; border: 4px solid #00b887; border-radius: 999px; background: #dff7ef; color: #008567; font-size: 1.5rem; font-weight: 900; box-shadow: 0 8px 20px rgba(0,184,135,.16); }
+        .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-stat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .profile-progress-track { height: .5rem; overflow: hidden; border-radius: 999px; background: #f1f5f9; }
+        .profile-progress-value { height: 100%; border-radius: 999px; background: #00b887; }
+        .profile-logout { border-color: #ef4444 !important; color: #dc2626 !important; }
+        .profile-logout:hover { background: #fef2f2 !important; }
+        .profile-footer-actions { padding-top: 5rem !important; padding-bottom: 5rem !important; }
+        @media (min-width: 1024px) {
+            .profile-main { max-width: 80rem; margin-inline: auto; padding: 2.5rem 2.5rem 8rem; }
+            .profile-hero { display: grid; grid-template-columns: 4fr 8fr; gap: 1.5rem; }
+            .profile-identity,
+            .profile-physical { border: 1px solid #e2e8f0; border-radius: 2rem; box-shadow: 0 16px 45px rgba(26,43,72,.06); }
+            .profile-identity { display: flex; min-height: 15rem; flex-direction: column; align-items: center; justify-content: center; }
+            .profile-physical { min-height: 15rem; align-items: stretch; }
+            .profile-physical > div { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+            .profile-content { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 1.5rem; padding: 1.5rem 0 0 !important; }
+            .profile-content > :not([hidden]) ~ :not([hidden]) { margin-top: 0; }
+            .profile-goal { grid-column: span 12 / span 12; padding: 1.75rem !important; border-radius: 2rem !important; }
+            .profile-statistics { grid-column: span 4 / span 4; }
+            .profile-stat-grid { height: calc(100% - 2rem); grid-template-columns: 1fr; grid-template-rows: repeat(2, minmax(0, 1fr)); }
+            .profile-history { grid-column: span 8 / span 8; min-height: 22rem; padding: 1.75rem !important; border-radius: 2rem !important; }
+            .profile-settings { max-width: 80rem; margin: 1.5rem auto 2rem; border: 1px solid #e2e8f0 !important; border-radius: 2rem; overflow: hidden; box-shadow: 0 16px 45px rgba(26,43,72,.05); }
+            .profile-footer-actions { max-width: 80rem; margin-inline: auto; padding-top: 1.75rem !important; padding-right: 0 !important; padding-bottom: 2rem !important; padding-left: 0 !important; transform: translateY(-3rem); }
+            .profile-footer-actions a { width: 20rem !important; max-width: 100%; margin-inline: auto; }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+{% set userGoal = app.user.goal %}
+{% set firstName = app.user.name ? app.user.name|split(' ')|first : 'Utilisateur' %}
+<div class="profile-page fit-page fit-text min-h-screen font-sans">
+    <div class="profile-shell min-h-screen bg-[#f7f9fc]">
+        {% include 'components/_app_header.html.twig' %}
+
+        <main class="profile-main pb-28">
+          <div class="profile-hero">
+            <section class="profile-identity bg-white px-5 pb-5 pt-7 text-center" aria-labelledby="profile-name">
+                <div class="profile-avatar">
+                    {% if app.user.photo %}
+                        <img src="{{ asset(app.user.photo) }}" alt="Photo de {{ app.user.name }}" class="h-full w-full object-cover">
+                    {% else %}
+                        {{ app.user.name ? app.user.name|first|upper : 'U' }}
+                    {% endif %}
+                </div>
+                <h1 id="profile-name" class="mt-3 text-base font-black text-[#15233c]">{{ app.user.name }}</h1>
+                <p class="mt-1 text-[0.6875rem] text-slate-400">Membre depuis {{ profile.memberSince }}</p>
+            </section>
+
+            <section class="profile-physical border-y border-slate-200 bg-white" aria-label="Informations physiques">
+                <div class="border-r border-slate-200 px-3 py-4 text-center"><span class="block text-[0.625rem] font-bold uppercase text-slate-500">Taille</span><strong class="mt-1 block text-sm">{{ userGoal ? userGoal.heightCm ~ ' cm' : '—' }}</strong></div>
+                <div class="border-r border-slate-200 px-3 py-4 text-center"><span class="block text-[0.625rem] font-bold uppercase text-slate-500">Poids actuel</span><strong class="mt-1 block text-sm">{{ profile.currentWeight is not null ? profile.currentWeight|number_format(1, ',', ' ') ~ ' kg' : 'Aucune pesée' }}</strong><small class="mt-1 block text-[0.4375rem] leading-3 text-slate-400">Mis à jour depuis le journal quotidien</small></div>
+                <div class="px-3 py-4 text-center"><span class="block text-[0.625rem] font-bold uppercase text-slate-500">IMC</span><strong class="mt-1 block text-sm text-amber-600">{{ profile.bmi is not null ? profile.bmi|number_format(1, ',', ' ') : '—' }}</strong><small class="mt-1 inline-block rounded bg-amber-50 px-1.5 py-0.5 text-[0.4375rem] font-extrabold uppercase text-amber-700">{{ profile.bmi is not null ? (profile.bmi < 18.5 ? 'Insuffisant' : (profile.bmi < 25 ? 'Équilibré' : (profile.bmi < 30 ? 'Élevé' : 'Très élevé'))) : 'À calculer' }}</small></div>
+            </section>
+          </div>
+
+            <div class="profile-content space-y-5 px-4 py-5">
+                <section class="profile-goal rounded-2xl border border-slate-200 bg-white p-5 shadow-sm" aria-labelledby="goal-title">
+                    <p class="text-[0.5625rem] font-extrabold uppercase tracking-wider text-slate-400">Objectif</p>
+                    <div class="mt-2 flex items-end justify-between gap-4"><h2 id="goal-title" class="text-sm font-black">Poids perdu : {{ userGoal and profile.currentWeight is not null ? (userGoal.initialWeight - profile.currentWeight)|abs|number_format(1, ',', ' ') : '0' }} kg</h2><p class="text-right text-[0.625rem]"><strong>Cible: {{ userGoal ? userGoal.targetWeight|number_format(0) ~ ' kg' : '—' }}</strong><br><span>{{ profile.progress }}% atteint</span></p></div>
+                    <div class="profile-progress-track mt-3" role="progressbar" aria-valuenow="{{ profile.progress }}" aria-valuemin="0" aria-valuemax="100"><div class="profile-progress-value" style="width:{{ profile.progress }}%"></div></div>
+                    <p class="mt-3 text-[0.5625rem] italic leading-4 text-slate-500">“Continue comme ça, {{ firstName }}, plus que {{ userGoal and profile.currentWeight is not null ? (profile.currentWeight - userGoal.targetWeight)|abs|number_format(1, ',', ' ') : '—' }} kg pour ton objectif !”</p>
+                </section>
+
+                <section class="profile-statistics" aria-labelledby="statistics-title">
+                    <h2 id="statistics-title" class="text-center text-xs font-black">Mes statistiques</h2>
+                    <div class="profile-stat-grid mt-3 gap-4">
+                        <div class="rounded-xl border border-emerald-100 bg-emerald-50 p-5 text-center"><span class="mx-auto flex size-10 items-center justify-center rounded-full bg-emerald-100 text-xl" aria-hidden="true">⚖</span><strong class="mt-2 block text-lg text-emerald-700">{{ profile.weighInsCount }}</strong><span class="text-[0.5625rem] text-slate-500">Pesées</span></div>
+                        <div class="rounded-xl border border-indigo-100 bg-indigo-50 p-5 text-center"><span class="mx-auto flex size-10 items-center justify-center rounded-full bg-indigo-100 text-xl" aria-hidden="true">▣</span><strong class="mt-2 block text-lg text-indigo-700">{{ profile.trackedDays }}</strong><span class="text-[0.5625rem] text-slate-500">Jours suivis</span></div>
+                    </div>
+                </section>
+
+                <section class="profile-history rounded-2xl border border-slate-200 bg-white p-5 shadow-sm" aria-labelledby="weight-history-title">
+                    <h2 id="weight-history-title" class="text-center text-xs font-black">Évolution du poids</h2>
+                    {% if profile.chartValues|length > 1 %}
+                        {% set minWeight = min(profile.chartValues) %}{% set maxWeight = max(profile.chartValues) %}{% set spread = max(maxWeight - minWeight, 1) %}
+                        <div class="mt-5 flex h-32 items-end gap-2 border-b border-slate-200">
+                            {% for weight in profile.chartValues %}<div class="flex h-full flex-1 items-end"><div class="w-full rounded-t bg-emerald-500" style="height:{{ 35 + ((weight - minWeight) / spread * 65) }}%" title="{{ weight|number_format(1, ',', ' ') }} kg"></div></div>{% endfor %}
+                        </div>
+                        <div class="mt-2 flex justify-between text-[0.5rem] text-slate-400">{% for label in profile.chartLabels %}<span>{{ label }}</span>{% endfor %}</div>
+                    {% else %}
+                        <p class="mt-4 rounded-xl bg-slate-50 px-4 py-6 text-center text-xs text-slate-500">Ajoutez au moins deux pesées dans votre journal pour afficher l’évolution.</p>
+                    {% endif %}
+                </section>
+            </div>
+
+            <section class="profile-settings border-y border-slate-200 bg-white" aria-labelledby="settings-title">
+                <h2 id="settings-title" class="px-5 py-4 text-center text-xs font-black">Paramètres &amp; Préférences</h2>
+                {% set settings = [['⚙', 'Paramètres du compte', path('app_profile_account')], ['♧', 'Notifications', path('app_notifications')], ['▣', 'Confidentialité', path('app_profile_privacy')], ['◉', 'Accessibilité', path('app_accessibility')]] %}
+                {% for setting in settings %}<a href="{{ setting[2] }}" class="flex w-full items-center gap-3 border-t border-slate-100 px-5 py-4 text-left text-xs transition hover:bg-slate-50"><span aria-hidden="true">{{ setting[0] }}</span><span class="flex-1">{{ setting[1] }}</span><span class="text-slate-300" aria-hidden="true">›</span></a>{% endfor %}
+            </section>
+
+            <div class="profile-footer-actions px-4 py-7 text-center"><a href="{{ path('app_logout') }}" class="profile-logout flex w-full items-center justify-center rounded-xl border-2 px-4 py-3 text-xs font-bold transition">Déconnexion</a><p class="mt-5 text-[0.5625rem] text-slate-400">Version 1.4.0</p></div>
+        </main>
+
+        {% include 'components/_app_navigation.html.twig' with {active: 'profile'} %}
+    </div>
+</div>
+{% endblock %}

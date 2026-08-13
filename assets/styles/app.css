@@ -20,6 +20,86 @@ body {
     color: var(--fit-navy);
 }
 
+/* Préférences d’accessibilité persistantes sur toute l’application. */
+.fit-high-contrast body {
+    background: #fff !important;
+    color: #000 !important;
+    filter: none;
+}
+
+.fit-high-contrast .fit-page,
+.fit-high-contrast .bg-white,
+.fit-high-contrast .app-header,
+.fit-high-contrast .app-navigation,
+.fit-high-contrast .accessibility-card,
+.fit-high-contrast .account-card,
+.fit-high-contrast .privacy-card {
+    border-color: #111827 !important;
+    background-color: #fff !important;
+    color: #000 !important;
+}
+
+.fit-high-contrast a,
+.fit-high-contrast button,
+.fit-high-contrast strong,
+.fit-high-contrast h1,
+.fit-high-contrast h2 {
+    color: #000 !important;
+}
+
+.fit-high-contrast :focus-visible {
+    outline: 4px solid #000 !important;
+    outline-offset: 3px !important;
+}
+
+.fit-dark-mode body,
+.fit-dark-mode .fit-page {
+    background-color: #111827 !important;
+    color: #f8fafc !important;
+}
+
+.fit-dark-mode .app-header,
+.fit-dark-mode .app-navigation,
+.fit-dark-mode .bg-white,
+.fit-dark-mode .accessibility-card,
+.fit-dark-mode .account-card,
+.fit-dark-mode .privacy-card,
+.fit-dark-mode .profile-settings {
+    border-color: #475569 !important;
+    background-color: #1f2937 !important;
+    color: #f8fafc !important;
+}
+
+.fit-dark-mode .text-slate-400,
+.fit-dark-mode .text-slate-500,
+.fit-dark-mode .text-slate-600 {
+    color: #cbd5e1 !important;
+}
+
+.fit-voice-assistance :focus-visible {
+    outline: 4px solid #f59e0b !important;
+    outline-offset: 3px !important;
+}
+
+.fit-reduced-motion *,
+.fit-reduced-motion *::before,
+.fit-reduced-motion *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+
 @layer components {
     .fit-text { color: var(--fit-navy); }
     .fit-page { background-color: var(--fit-page); }

@@ -9,18 +9,17 @@
         </a>
 
         <div class="flex items-center gap-2.5">
-            <span class="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-[11px] font-black text-white shadow-md shadow-emerald-500/20" aria-label="Avatar de {{ app.user and app.user.name ? app.user.name : 'l’utilisateur' }}">
+            <a href="{{ path('app_profile') }}" class="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-[11px] font-black text-white shadow-md shadow-emerald-500/20 transition hover:bg-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2" aria-label="Voir le profil de {{ app.user and app.user.name ? app.user.name : 'l’utilisateur' }}">
                 {{ app.user and app.user.name ? app.user.name|first|upper : 'U' }}
-            </span>
-            <button
-                type="button"
+            </a>
+            <a
+                href="{{ path('app_notifications') }}"
                 class="relative flex h-8 w-8 items-center justify-center rounded-full bg-slate-50 text-[#1A2B48] transition hover:bg-emerald-50 hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
-                aria-label="Ouvrir les notifications"
-                {% if notificationInteractive %}data-action="dashboard-actions#open" data-action-name="notifications" data-title="Notifications" data-content="Pensez à vous peser : aucune pesée n’a été enregistrée depuis 5 jours."{% endif %}
+                aria-label="Voir les notifications"
             >
                 <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17H9m9-2V9a6 6 0 10-12 0v6l-2 2h16l-2-2zM10 21h4"/></svg>
                 <span class="absolute right-1 top-1 size-2 rounded-full border-2 border-white bg-emerald-500" {% if notificationInteractive %}data-dashboard-actions-target="notificationDot"{% endif %}></span>
-            </button>
+            </a>
         </div>
     </div>
 </header>

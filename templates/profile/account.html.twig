@@ -1,0 +1,146 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paramètres du compte | FitProgress{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .account-main { width: 100%; max-width: 80rem; margin-inline: auto; padding-bottom: 9rem !important; }
+    .account-card { border: 1px solid #d7e0da; border-radius: 1rem; background: #fff; box-shadow: 0 2px 5px rgba(15,23,42,.05); }
+    .account-row + .account-row { border-top: 1px solid #d7e0da; }
+    .settings-back { display: inline-flex; align-items: center; gap: .75rem; margin-top: 1.5rem; margin-bottom: 1.5rem; color: #007a5e; font-size: 1.2rem; font-weight: 900; text-decoration: none; }
+    .settings-back:hover { color: #005f49; }
+    .settings-introduction { margin-bottom: 2.5rem; }
+    .settings-eyebrow { color: #008567; font-size: .65rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .settings-heading { margin-top: 1rem; color: #1a2b48; font-size: 2rem; font-weight: 900; line-height: 1.05; }
+    .settings-description { max-width: 46rem; margin-top: 1rem; color: #64748b; font-size: .9rem; line-height: 1.65; }
+    .account-avatar { display: flex; width: 5rem; height: 5rem; flex: 0 0 5rem; align-items: center; justify-content: center; overflow: hidden; border: 4px solid #00b887; border-radius: 999px; background: #dff7ef; color: #008567; font-size: 1.5rem; font-weight: 900; }
+    .account-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .account-logout { display: flex; width: 100%; align-items: center; justify-content: center; border: 1px solid #ef4444 !important; border-radius: .75rem; padding: 1rem; color: #dc2626 !important; font-size: .75rem; font-weight: 700; text-decoration: none; }
+    .account-logout:hover { background: #fef2f2; }
+    .account-logout-wrapper { margin-top: 1.5rem; margin-bottom: 1rem; }
+    .account-logout-wrapper .account-logout { max-width: 24rem; margin-inline: auto; }
+    .account-edit-card { grid-column: 1 / -1; }
+    .account-form-grid { display: grid; gap: 1rem; }
+    .account-field label { display: block; margin-bottom: .4rem; font-size: .68rem; font-weight: 800; }
+    .account-field input, .account-field select { width: 100%; border: 1px solid #cbd5e1; border-radius: .75rem; background: #fff; padding: .8rem; color: #1a2b48; font-size: .8rem; }
+    .account-field input:focus, .account-field select:focus { border-color: #00b887; outline: 3px solid rgba(0,184,135,.15); }
+    .account-save { width: 100%; border: 0; border-radius: .75rem; background: #00b887; padding: .9rem; color: #fff; font-size: .78rem; font-weight: 900; }
+    .account-pencil { display: inline-flex; width: 2rem; height: 2rem; flex: 0 0 2rem; align-items: center; justify-content: center; border: 1px solid #d7e0ea; border-radius: 999px; background: #fff; color: #008567; font-size: .9rem; text-decoration: none; box-shadow: 0 3px 10px rgba(15,23,42,.08); transition: .2s; }
+    .account-pencil:hover { border-color: #00b887; background: #dff7ef; }
+    .account-value-card { position: relative; }
+    .account-value-card .account-pencil { position: absolute; top: 1rem; right: 1rem; }
+    .account-edit-overlay { position: fixed; z-index: 60; inset: 0; display: flex; align-items: center; justify-content: center; overflow-y: auto; background: rgba(15,23,42,.55); padding: 1rem; }
+    .account-edit-overlay[hidden] { display: none; }
+    .account-edit-dialog { width: 100%; max-width: 64rem; max-height: calc(100vh - 2rem); overflow-y: auto; }
+    .account-edit-close { display: inline-flex; width: 2.25rem; height: 2.25rem; align-items: center; justify-content: center; border-radius: 999px; background: #f1f5f9; color: #1a2b48; font-size: 1.25rem; }
+    .account-security-grid { display: grid; gap: 1rem; }
+    @media (min-width: 1024px) {
+        .account-main { padding: 2.5rem 2.5rem 8rem !important; }
+        .account-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1.5rem; }
+        .account-profile-card { grid-column: span 2 / span 2; }
+        .account-form-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+        .account-section { margin-top: 0 !important; }
+        .account-security-section, .account-logout-wrapper { grid-column: 1 / -1; }
+        .account-security-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+{% set goal = app.user.goal %}
+{% set gender = goal and goal.gender ? (goal.gender.value == 'male' ? 'Homme' : (goal.gender.value == 'female' ? 'Femme' : 'Autre')) : 'Non renseigné' %}
+<div class="fit-page fit-text min-h-screen font-sans">
+    {% include 'components/_app_header.html.twig' %}
+    <main class="account-main px-4 pb-28 pt-5">
+        <a href="{{ path('app_profile') }}" class="settings-back" aria-label="Retour au profil"><span aria-hidden="true">←</span><span>Retour au profil</span></a>
+        <div class="settings-introduction">
+            <p class="settings-eyebrow">Paramètres du compte</p>
+            <h1 class="settings-heading">Votre compte,<br>vos informations</h1>
+            <p class="settings-description">Consultez vos informations personnelles, votre profil physique et gérez la sécurité de votre compte FitProgress.</p>
+        </div>
+        <div class="account-grid">
+            {% for message in app.flashes('success') %}<p class="account-profile-card rounded-xl bg-emerald-100 p-4 text-sm font-bold text-emerald-800">{{ message }}</p>{% endfor %}
+            <section class="account-profile-card account-card flex items-center gap-5 p-5">
+                <span class="account-avatar">
+                    {% if app.user.photo %}<img src="{{ asset(app.user.photo) }}" alt="Photo de {{ app.user.name }}" class="h-full w-full object-cover">{% else %}{{ app.user.name|first|upper }}{% endif %}
+                </span>
+                <div class="flex-1"><h1 class="text-xl font-black">{{ app.user.name }}</h1><p class="mt-1 text-xs text-slate-500">Membre depuis {{ memberSince }}</p>{% if app.user.photo %}<form method="post" action="{{ path('app_profile_photo_delete') }}" class="mt-3"><input type="hidden" name="_token" value="{{ csrf_token('delete-profile-photo') }}"><button class="text-xs font-bold text-red-600" type="submit">Supprimer la photo</button></form>{% endif %}</div>
+                <button type="button" class="account-pencil" data-edit-field="profile_account_photoFile" aria-label="Modifier mon nom ou ma photo" title="Modifier mon nom ou ma photo">✎</button>
+            </section>
+
+            <section class="account-section mt-6" aria-labelledby="personal-title">
+                <h2 id="personal-title" class="mb-3 text-[10px] font-extrabold uppercase tracking-wider text-emerald-700">Informations personnelles</h2>
+                <div class="account-card px-4">
+                    <div class="account-row flex items-center gap-3 py-4"><span class="flex size-8 items-center justify-center rounded bg-emerald-50">♙</span><div class="flex-1"><strong class="block text-[10px]">Nom complet</strong><span class="text-xs text-slate-600">{{ app.user.name }}</span></div><button type="button" class="account-pencil" data-edit-field="profile_account_name" aria-label="Modifier mon nom" title="Modifier mon nom">✎</button></div>
+                    <div class="account-row flex gap-3 py-4"><span class="flex size-8 items-center justify-center rounded bg-emerald-50">✉</span><div><strong class="block text-[10px]">Adresse e-mail</strong><span class="text-xs text-slate-600">{{ app.user.email }}</span></div></div>
+                    <div class="account-row flex gap-3 py-4"><span class="flex size-8 items-center justify-center rounded bg-emerald-50">☎</span><div><strong class="block text-[10px]">Numéro de téléphone</strong><span class="text-xs text-slate-600">{{ app.user.phone ?: 'Non renseigné' }}</span></div></div>
+                </div>
+            </section>
+
+            <section class="account-section mt-6" aria-labelledby="physical-title">
+                <h2 id="physical-title" class="mb-3 text-[10px] font-extrabold uppercase tracking-wider text-emerald-700">Profil physique</h2>
+                <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                    <div class="account-card account-value-card p-4"><button type="button" class="account-pencil" data-edit-field="profile_account_heightCm" aria-label="Modifier ma taille" title="Modifier ma taille">✎</button><span class="text-[10px]">Taille</span><strong class="mt-2 block text-3xl font-black">{{ goal ? goal.heightCm : '—' }} <small class="text-[10px] uppercase">cm</small></strong></div>
+                    <div class="account-card p-4"><span class="text-[10px]">Poids initial</span><strong class="mt-2 block text-3xl font-black">{{ goal and goal.initialWeight is not null ? goal.initialWeight|number_format(1, ',', ' ') : '—' }} <small class="text-[10px] uppercase">kg</small></strong></div>
+                    <div class="account-card p-4 sm:col-span-2 lg:col-span-1"><span class="text-[10px]">Poids actuel</span><strong class="mt-2 block text-3xl font-black">{{ currentWeight is not null ? currentWeight|number_format(1, ',', ' ') : 'Aucune pesée' }}{% if currentWeight is not null %} <small class="text-[10px] uppercase">kg</small>{% endif %}</strong><p class="mt-3 text-[10px] leading-4 text-slate-500">Le poids actuel est mis à jour depuis votre journal quotidien.</p><a href="{{ path('app_journal_today') }}" class="mt-3 inline-flex rounded-lg bg-emerald-50 px-3 py-2 text-[10px] font-black text-emerald-700">{{ currentWeight is null ? 'Ajouter ma première pesée' : 'Mettre à jour dans le journal' }}</a></div>
+                    <div class="account-card p-4"><span class="text-[10px]">Genre</span><strong class="mt-2 block text-3xl font-black">{{ gender }}</strong></div>
+                </div>
+            </section>
+
+            <section class="account-section account-security-section mt-6" aria-labelledby="security-title">
+                <h2 id="security-title" class="mb-3 text-[10px] font-extrabold uppercase tracking-wider text-emerald-700">Sécurité</h2>
+                <div class="account-security-grid">
+                    <a href="{{ path('app_profile_password') }}" class="account-card flex items-center gap-3 p-4 transition hover:border-emerald-400"><span class="flex size-8 items-center justify-center rounded bg-emerald-50">♙</span><span class="flex-1"><strong class="block text-[10px]">Changer le mot de passe</strong><small class="text-slate-500">{{ app.user.passwordChangedAt ? 'Mis à jour le ' ~ app.user.passwordChangedAt|date('d/m/Y') : 'Aucune date de modification disponible' }}</small></span><span>›</span></a>
+                    <a href="{{ path('app_profile_email') }}" class="account-card flex items-center gap-3 p-4 transition hover:border-emerald-400"><span class="flex size-8 items-center justify-center rounded bg-emerald-50">✉</span><span class="flex-1"><strong class="block text-[10px]">Changer l’adresse e-mail</strong><small class="text-slate-500">Confirmation de la nouvelle adresse requise</small></span><span>›</span></a>
+                </div>
+            </section>
+
+            <div id="account-edit-overlay" class="account-edit-overlay" role="dialog" aria-modal="true" aria-labelledby="edit-profile-title" {{ accountForm.vars.submitted and not accountForm.vars.valid ? '' : 'hidden' }}>
+            <section class="account-edit-dialog account-card p-5">
+                <div class="mb-5 flex items-center justify-between gap-4"><h2 id="edit-profile-title" class="text-sm font-black">Modifier mes informations</h2><button id="account-edit-close" type="button" class="account-edit-close" aria-label="Fermer la fenêtre">×</button></div>
+                {{ form_start(accountForm) }}
+                    <div class="account-form-grid">
+                        {% for field in [accountForm.name, accountForm.email, accountForm.phone, accountForm.photoFile, accountForm.heightCm, accountForm.targetWeight, accountForm.birthDate, accountForm.gender] %}
+                            <div class="account-field">{{ form_label(field) }}{{ form_widget(field) }}{{ form_errors(field) }}</div>
+                        {% endfor %}
+                    </div>
+                    <button type="submit" class="account-save mt-5">Enregistrer les modifications</button>
+                {{ form_end(accountForm) }}
+            </section>
+            </div>
+
+            <div class="account-section account-logout-wrapper flex items-end"><a href="{{ path('app_logout') }}" class="account-logout">↪&nbsp; Se déconnecter de FitProgress</a></div>
+        </div>
+    </main>
+    {% include 'components/_app_navigation.html.twig' with {active: 'profile'} %}
+</div>
+<script>
+(() => {
+    const initializeAccountEditor = () => {
+        const overlay = document.getElementById('account-edit-overlay');
+        const closeButton = document.getElementById('account-edit-close');
+        if (!overlay || overlay.dataset.initialized === 'true') return;
+        overlay.dataset.initialized = 'true';
+
+        let opener = null;
+        const close = () => {
+            overlay.hidden = true;
+            document.body.style.overflow = '';
+            opener?.focus();
+        };
+        document.querySelectorAll('[data-edit-field]').forEach((button) => button.addEventListener('click', () => {
+            opener = button;
+            overlay.hidden = false;
+            document.body.style.overflow = 'hidden';
+            window.setTimeout(() => document.getElementById(button.dataset.editField)?.focus(), 0);
+        }));
+        closeButton.addEventListener('click', close);
+        overlay.addEventListener('click', (event) => { if (event.target === overlay) close(); });
+        document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !overlay.hidden) close(); });
+        if (!overlay.hidden) document.body.style.overflow = 'hidden';
+    };
+    initializeAccountEditor();
+    document.addEventListener('turbo:load', initializeAccountEditor);
+})();
+</script>
+{% endblock %}

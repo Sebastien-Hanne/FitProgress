@@ -38,6 +38,7 @@ security:
         - { path: ^/register$, roles: PUBLIC_ACCESS }
         - { path: ^/register/coach$, roles: PUBLIC_ACCESS }
         - { path: ^/logout$, roles: PUBLIC_ACCESS }
+        - { path: ^/(conditions-utilisation|politique-confidentialite)$, roles: PUBLIC_ACCESS }
 
         # Administration
         - { path: ^/admin, roles: ROLE_ADMIN }
@@ -54,7 +55,9 @@ security:
 
         # Espace commun (ROLE_USER suffit grâce à role_hierarchy)
         - { path: ^/dashboard, roles: ROLE_USER }
+        - { path: ^/bienvenue/questionnaire$, roles: ROLE_USER }
         - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/accessibility$, roles: ROLE_USER }
         - { path: ^/messages, roles: ROLE_USER }
         - { path: ^/notifications, roles: ROLE_USER }
         - { path: ^/sessions, roles: ROLE_USER }
