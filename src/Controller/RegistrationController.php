@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\RegistrationFormType;
+use App\Security\AppAuthenticator;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -13,6 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class RegistrationController extends AbstractController
 {
@@ -22,7 +24,8 @@ class RegistrationController extends AbstractController
         UserPasswordHasherInterface $userPasswordHasher,
         EntityManagerInterface $entityManager,
         MailerInterface $mailer,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        Security $security,
     ): Response {
         if ($this->getUser()) {
             return $this->redirectToRoute('app_home');
@@ -62,9 +65,10 @@ class RegistrationController extends AbstractController
                 ]);
             }
 
-            $this->addFlash('success', 'Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter.');
+            $security->login($user, AppAuthenticator::class, 'main');
+            $this->addFlash('success', 'Votre compte est créé. Répondez à ces quatre questions pour personnaliser votre suivi.');
 
-            return $this->redirectToRoute('app_login');
+            return $this->redirectToRoute('app_onboarding');
         }
 
         // Si le formulaire est soumis mais INVALIDE, on renvoie un statut HTTP 422 pour Turbo/UX

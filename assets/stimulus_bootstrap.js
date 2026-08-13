@@ -3,9 +3,11 @@ import DashboardActionsController from './controllers/dashboard_actions_controll
 import DashboardChartController from './controllers/dashboard_chart_controller.js';
 import JournalMealsController from './controllers/journal_meals_controller.js';
 import JournalEntryController from './controllers/journal_entry_controller.js';
+import AccessibilityController from './controllers/accessibility_controller.js';
 
 const app = startStimulusApp();
 app.register('dashboard-actions', DashboardActionsController);
 app.register('dashboard-chart', DashboardChartController);
 app.register('journal-meals', JournalMealsController);
 app.register('journal-entry', JournalEntryController);
+app.register('accessibility', AccessibilityController);

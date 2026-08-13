@@ -77,7 +77,8 @@ const initializeJournal = () => {
     });
     weightWheel?.addEventListener('pointermove', (event) => {
         if (dragStartX === undefined) return;
-        setWeight(dragStartWeight - Math.trunc((event.clientX - dragStartX) / 12) * 0.1);
+        // Convention FitProgress : droite = augmentation, gauche = diminution.
+        setWeight(dragStartWeight + Math.trunc((event.clientX - dragStartX) / 12) * 0.1);
     });
     const stopDragging = () => { dragStartX = undefined; dragStartWeight = undefined; };
     weightWheel?.addEventListener('pointerup', stopDragging);
@@ -85,7 +86,7 @@ const initializeJournal = () => {
     weightWheel?.addEventListener('wheel', (event) => {
         event.preventDefault();
         const increase = Math.abs(event.deltaX) > Math.abs(event.deltaY)
-            ? event.deltaX < 0
+            ? event.deltaX > 0
             : event.deltaY < 0;
         setWeight((Number.parseFloat(weightInput?.value) || 0) + (increase ? 0.1 : -0.1));
     }, { passive: false });

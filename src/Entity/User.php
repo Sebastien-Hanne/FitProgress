@@ -39,6 +39,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $photo = null;
 
+    #[ORM\Column(length: 30, nullable: true)]
+    private ?string $phone = null;
+
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $resetToken = null;
 
@@ -56,6 +59,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'datetime_immutable')]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $passwordChangedAt = null;
+
+    #[ORM\Column(length: 180, nullable: true)]
+    private ?string $pendingEmail = null;
+
+    #[ORM\Column(length: 64, nullable: true)]
+    private ?string $emailChangeToken = null;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $emailChangeExpiresAt = null;
 
     // --- RELATIONS ---
 
@@ -201,6 +216,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): static
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
     public function getResetToken(): ?string
     {
         return $this->resetToken;
@@ -254,6 +281,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->updatedAt;
     }
+
+    public function getPasswordChangedAt(): ?\DateTimeImmutable
+    {
+        return $this->passwordChangedAt;
+    }
+
+    public function setPasswordChangedAt(?\DateTimeImmutable $passwordChangedAt): static
+    {
+        $this->passwordChangedAt = $passwordChangedAt;
+
+        return $this;
+    }
+
+    public function getPendingEmail(): ?string { return $this->pendingEmail; }
+    public function setPendingEmail(?string $pendingEmail): static { $this->pendingEmail = $pendingEmail; return $this; }
+    public function getEmailChangeToken(): ?string { return $this->emailChangeToken; }
+    public function setEmailChangeToken(?string $emailChangeToken): static { $this->emailChangeToken = $emailChangeToken; return $this; }
+    public function getEmailChangeExpiresAt(): ?\DateTimeImmutable { return $this->emailChangeExpiresAt; }
+    public function setEmailChangeExpiresAt(?\DateTimeImmutable $expiresAt): static { $this->emailChangeExpiresAt = $expiresAt; return $this; }
 
     // --- RELATIONS ---
 
