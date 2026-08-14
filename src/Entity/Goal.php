@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Enum\Gender;
 use App\Repository\GoalRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: GoalRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -30,6 +31,10 @@ class Goal
 
     #[ORM\Column(type: 'decimal', precision: 5, scale: 2)]
     private ?string $targetWeight = null;
+
+    #[ORM\Column(type: 'date_immutable', nullable: true)]
+    #[Assert\GreaterThanOrEqual('today', message: 'La date cible ne peut pas être dans le passé.')]
+    private ?\DateTimeImmutable $targetDate = null;
 
     #[ORM\Column(type: 'date_immutable')]
     private ?\DateTimeImmutable $birthDate = null;
@@ -108,6 +113,18 @@ class Goal
     public function setTargetWeight(string $targetWeight): static
     {
         $this->targetWeight = $targetWeight;
+        return $this;
+    }
+
+    public function getTargetDate(): ?\DateTimeImmutable
+    {
+        return $this->targetDate;
+    }
+
+    public function setTargetDate(?\DateTimeImmutable $targetDate): static
+    {
+        $this->targetDate = $targetDate;
+
         return $this;
     }
 

@@ -1,0 +1,91 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ma cible | FitProgress{% endblock %}
+
+{% block body %}
+<div class="fit-page min-h-screen font-sans text-[#1A2B48]">
+    {% include 'components/_app_header.html.twig' %}
+
+    <main class="mx-auto max-w-3xl px-4 pb-28 pt-5 sm:px-6 lg:pt-10">
+        {% for message in app.flashes('success') %}
+            <div class="mb-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-700" role="status">{{ message }}</div>
+        {% endfor %}
+
+        <section aria-labelledby="goal-title">
+            <span class="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-1 text-[10px] font-extrabold uppercase tracking-wide text-emerald-700">
+                <span aria-hidden="true">⚑</span> Objectif actif
+            </span>
+            <h1 id="goal-title" class="mt-4 text-2xl font-black leading-tight sm:text-3xl">
+                Cible : <span class="text-emerald-500">{{ goal.targetWeight|number_format(0, ',', ' ') }} kg</span>{% if goal.targetDate %} d’ici le {{ goal.targetDate|date('d/m/Y') }}{% endif %}
+            </h1>
+            <p class="mt-3 max-w-xl text-sm leading-6 text-slate-500">Vous dépassez vos objectifs ! Vos efforts constants se reflètent clairement dans vos tendances ce mois-ci.</p>
+        </section>
+
+        <section class="py-7 text-center" aria-label="Progression vers l’objectif">
+            <div class="relative mx-auto size-36">
+                <svg class="size-36 -rotate-90" viewBox="0 0 120 120" aria-hidden="true">
+                    <circle cx="60" cy="60" r="48" fill="none" stroke="#dce6e9" stroke-width="7"/>
+                    <circle cx="60" cy="60" r="48" fill="none" stroke="#007a5e" stroke-width="7" stroke-linecap="round" pathLength="100" stroke-dasharray="{{ progress }} 100"/>
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                    <strong class="text-3xl font-black">{{ progress }}%</strong>
+                    <span class="mt-1 text-[9px] font-bold uppercase tracking-widest text-slate-500">Atteint</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid grid-cols-2 gap-3" aria-label="Résumé de l’objectif">
+            <article class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div class="flex items-center justify-between text-xs text-slate-500"><span>Kilos<br>restants</span><span class="text-emerald-600">▣</span></div>
+                <p class="mt-3 text-3xl font-black">{{ remainingWeight|number_format(1, ',', ' ') }} <small class="text-xs font-bold text-slate-500">kg</small></p>
+            </article>
+            <article class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div class="flex items-center justify-between text-xs text-slate-500"><span>Jours<br>restants</span><span class="text-amber-600">□</span></div>
+                <p class="mt-3 text-3xl font-black">{{ daysRemaining ?? '—' }} <small class="text-xs font-bold text-slate-500">jours</small></p>
+            </article>
+        </section>
+
+        <section class="mt-5 rounded-xl border border-slate-200 bg-white p-5 shadow-sm" aria-labelledby="edit-goal-title">
+            <h2 id="edit-goal-title" class="flex items-center gap-2 text-base font-black"><span aria-hidden="true">≡</span> Modifier l’Objectif</h2>
+            {{ form_start(goalForm, {attr: {class: 'mt-5 grid gap-4'}}) }}
+                <div>
+                    {{ form_label(goalForm.targetWeight, null, {label_attr: {class: 'mb-2 block text-xs font-medium'}}) }}
+                    {{ form_widget(goalForm.targetWeight, {attr: {class: 'w-full rounded-lg border-0 bg-[#f0f4ff] px-3 py-3 text-sm outline-none ring-1 ring-transparent focus:ring-2 focus:ring-emerald-500'}}) }}
+                    {{ form_errors(goalForm.targetWeight) }}
+                </div>
+                <div>
+                    {{ form_label(goalForm.targetDate, null, {label_attr: {class: 'mb-2 block text-xs font-medium'}}) }}
+                    {{ form_widget(goalForm.targetDate, {attr: {class: 'w-full rounded-lg border-0 bg-[#f0f4ff] px-3 py-3 text-sm outline-none ring-1 ring-transparent focus:ring-2 focus:ring-emerald-500'}}) }}
+                    {{ form_errors(goalForm.targetDate) }}
+                </div>
+                <button class="mt-1 w-full rounded-lg bg-emerald-500 px-4 py-3 text-sm font-extrabold text-white transition hover:bg-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">Mettre à jour le suivi</button>
+            {{ form_end(goalForm) }}
+        </section>
+
+        <section class="mt-5 rounded-xl border border-slate-200 bg-white p-5 shadow-sm" aria-labelledby="goal-history-title">
+            <div class="flex items-center justify-between">
+                <h2 id="goal-history-title" class="flex items-center gap-2 text-base font-black"><span class="text-indigo-600" aria-hidden="true">◷</span> Historique</h2>
+                <span class="text-xs font-bold text-emerald-700">Voir tout</span>
+            </div>
+            <div class="mt-4 grid gap-3">
+                <article class="flex items-center gap-3 rounded-lg bg-emerald-50/70 p-3">
+                    <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">✓</span>
+                    <div class="min-w-0 flex-1"><h3 class="text-sm font-bold">Objectif en cours</h3><p class="mt-1 text-[10px] text-slate-500">{{ currentWeight|number_format(1, ',', ' ') }} kg actuellement · Cible {{ goal.targetWeight|number_format(1, ',', ' ') }} kg</p></div>
+                    <span class="self-start text-[10px] font-extrabold text-emerald-700">Actif</span>
+                </article>
+                {% for item in history %}
+                    <article class="flex items-center gap-3 rounded-lg bg-slate-50 p-3">
+                        <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-700">□</span>
+                        <div class="min-w-0 flex-1"><h3 class="text-sm font-bold">Ancienne cible</h3><p class="mt-1 text-[10px] text-slate-500">Cible {{ item.targetWeight|number_format(1, ',', ' ') }} kg{% if item.targetDate %} · {{ item.targetDate|date('d/m/Y') }}{% endif %}</p></div>
+                        <span class="self-start text-[10px] font-extrabold text-slate-500">Archivé</span>
+                    </article>
+                {% else %}
+                    <p class="rounded-lg bg-slate-50 p-4 text-center text-xs text-slate-500">Vos précédents objectifs apparaîtront ici.</p>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+
+    {% include 'components/_app_navigation.html.twig' with {active: 'target'} %}
+</div>
+{% endblock %}

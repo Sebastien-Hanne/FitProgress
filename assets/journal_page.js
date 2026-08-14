@@ -1,5 +1,13 @@
 const initializedJournals = new WeakSet();
 
+// Source unique de vérité pour la direction de la roue.
+// Un delta horizontal négatif diminue le poids, un delta positif l'augmente.
+export const weightFromHorizontalDrag = (startWeight, startX, currentX) => {
+    const steps = Math.trunc((currentX - startX) / 12);
+
+    return startWeight + steps * 0.1;
+};
+
 const initializeJournal = () => {
     const journal = document.querySelector('[data-journal-page]');
     if (!journal || initializedJournals.has(journal)) return;
@@ -65,7 +73,9 @@ const initializeJournal = () => {
     const setWeight = (value) => {
         if (!weightInput) return;
         weightInput.value = Math.max(0, Math.min(500, value)).toFixed(1);
-        if (weightWheel) weightWheel.style.backgroundPositionX = `${value * 10}px`;
+        // La graduation se déplace dans le sens opposé à la valeur, comme une
+        // vraie réglette qui passe sous le repère central.
+        if (weightWheel) weightWheel.style.backgroundPositionX = `${value * -10}px`;
     };
     journal.querySelectorAll('[data-weight-change]').forEach((button) => {
         button.addEventListener('click', () => setWeight((Number.parseFloat(weightInput?.value) || 0) + Number.parseFloat(button.dataset.weightChange)));
@@ -77,8 +87,7 @@ const initializeJournal = () => {
     });
     weightWheel?.addEventListener('pointermove', (event) => {
         if (dragStartX === undefined) return;
-        // Convention FitProgress : droite = augmentation, gauche = diminution.
-        setWeight(dragStartWeight + Math.trunc((event.clientX - dragStartX) / 12) * 0.1);
+        setWeight(weightFromHorizontalDrag(dragStartWeight, dragStartX, event.clientX));
     });
     const stopDragging = () => { dragStartX = undefined; dragStartWeight = undefined; };
     weightWheel?.addEventListener('pointerup', stopDragging);
@@ -91,7 +100,7 @@ const initializeJournal = () => {
         setWeight((Number.parseFloat(weightInput?.value) || 0) + (increase ? 0.1 : -0.1));
     }, { passive: false });
     weightInput?.addEventListener('input', () => {
-        if (weightWheel) weightWheel.style.backgroundPositionX = `${(Number.parseFloat(weightInput.value) || 0) * 10}px`;
+        if (weightWheel) weightWheel.style.backgroundPositionX = `${(Number.parseFloat(weightInput.value) || 0) * -10}px`;
     });
 
     const energyLabels = ['Très faible', 'Faible', 'Stable', 'Concentré', 'Dynamique'];
@@ -125,7 +134,7 @@ const initializeJournal = () => {
     updateEnergy();
     updateActivity();
     updateSleepQuality();
-    if (weightWheel) weightWheel.style.backgroundPositionX = `${(Number.parseFloat(weightInput?.value) || 0) * 10}px`;
+    if (weightWheel) weightWheel.style.backgroundPositionX = `${(Number.parseFloat(weightInput?.value) || 0) * -10}px`;
 };
 
 document.addEventListener('turbo:load', initializeJournal);
