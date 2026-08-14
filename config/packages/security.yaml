@@ -48,6 +48,7 @@ security:
 
         # Espace utilisateur uniquement
         - { path: ^/journal, roles: ROLE_USER }
+        - { path: ^/cible$, roles: ROLE_USER }
         - { path: ^/goal, roles: ROLE_USER }
         - { path: ^/history, roles: ROLE_USER }
         - { path: ^/export, roles: ROLE_USER }
