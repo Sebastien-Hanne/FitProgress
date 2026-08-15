@@ -12,6 +12,11 @@
             <a href="{{ path('app_profile') }}" class="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-[11px] font-black text-white shadow-md shadow-emerald-500/20 transition hover:bg-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2" aria-label="Voir le profil de {{ app.user and app.user.name ? app.user.name : 'l’utilisateur' }}">
                 {{ app.user and app.user.name ? app.user.name|first|upper : 'U' }}
             </a>
+            {% set unreadMessages = unread_message_count() %}
+            <a href="{{ path('app_messages_index') }}" class="relative flex h-8 w-8 items-center justify-center rounded-full bg-slate-50 text-[#1A2B48] hover:bg-emerald-50 hover:text-emerald-700" aria-label="Messagerie, {{ unreadMessages }} message{{ unreadMessages != 1 ? 's' }} non lu{{ unreadMessages != 1 ? 's' }}">
+                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5h16v12H7l-3 3V5zm4 4h8m-8 4h5"/></svg>
+                {% if unreadMessages > 0 %}<span class="absolute -right-1 -top-1 flex min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[9px] font-black leading-4 text-white">{{ unreadMessages > 99 ? '99+' : unreadMessages }}</span>{% endif %}
+            </a>
             <a
                 href="{{ path('app_notifications') }}"
                 class="relative flex h-8 w-8 items-center justify-center rounded-full bg-slate-50 text-[#1A2B48] transition hover:bg-emerald-50 hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"

@@ -43,6 +43,9 @@ class Conversation
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $lastMessageAt = null;
 
+    #[ORM\Column(length: 150)]
+    private string $title = 'Accompagnement';
+
 
     #[ORM\OneToMany(
         targetEntity: Message::class,
@@ -108,6 +111,17 @@ class Conversation
     public function setLastMessageAt(?\DateTimeImmutable $lastMessageAt): static
     {
         $this->lastMessageAt = $lastMessageAt;
+        return $this;
+    }
+
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(string $title): static
+    {
+        $this->title = $title;
         return $this;
     }
 

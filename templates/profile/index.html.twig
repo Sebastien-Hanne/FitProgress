@@ -98,7 +98,9 @@
 
             <section class="profile-settings border-y border-slate-200 bg-white" aria-labelledby="settings-title">
                 <h2 id="settings-title" class="px-5 py-4 text-center text-xs font-black">Paramètres &amp; Préférences</h2>
-                {% set settings = [['⚙', 'Paramètres du compte', path('app_profile_account')], ['⌁', 'Mon coach', path('app_coach_status')], ['♧', 'Notifications', path('app_notifications')], ['▣', 'Confidentialité', path('app_profile_privacy')], ['◉', 'Accessibilité', path('app_accessibility')]] %}
+                {% set settings = [['⚙', 'Paramètres du compte', path('app_profile_account')]] %}
+                {% if is_granted('ROLE_COACH') %}{% set settings = settings|merge([['⌁', 'Demandes de coaching', path('app_coach_requests_index')]]) %}{% else %}{% set settings = settings|merge([['⌁', 'Mon coach', path('app_coach_status')]]) %}{% endif %}
+                {% set settings = settings|merge([['✉', 'Messagerie', path('app_messages_index')], ['♧', 'Notifications', path('app_notifications')], ['▣', 'Confidentialité', path('app_profile_privacy')], ['◉', 'Accessibilité', path('app_accessibility')]]) %}
                 {% for setting in settings %}<a href="{{ setting[2] }}" class="flex w-full items-center gap-3 border-t border-slate-100 px-5 py-4 text-left text-xs transition hover:bg-slate-50"><span aria-hidden="true">{{ setting[0] }}</span><span class="flex-1">{{ setting[1] }}</span><span class="text-slate-300" aria-hidden="true">›</span></a>{% endfor %}
             </section>
 
