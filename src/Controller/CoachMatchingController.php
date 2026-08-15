@@ -4,7 +4,9 @@ namespace App\Controller;
 
 use App\Entity\CoachProfile;
 use App\Entity\CoachRequest;
+use App\Entity\Notification;
 use App\Entity\User;
+use App\Enum\NotificationType;
 use App\Enum\RequestStatus;
 use App\Repository\CoachProfileRepository;
 use App\Repository\CoachRequestRepository;
@@ -87,6 +89,12 @@ final class CoachMatchingController extends AbstractController
         $coachRequest = (new CoachRequest())->setUser($user)->setCoachProfile($coach)
             ->setMessage(mb_substr($message, 0, 2000));
         $entityManager->persist($coachRequest);
+        $coachUser = $coach->getUser();
+        if ($coachUser instanceof User) {
+            $notification = (new Notification())->setUser($coachUser)->setType(NotificationType::new_coach_request)
+                ->setTitle('Nouvelle demande de coaching')->setContent($user->getName().' souhaite être accompagné par vous.');
+            $entityManager->persist($notification);
+        }
         $entityManager->flush();
         $this->addFlash('success', $current ? 'Votre changement de coach a bien été demandé.' : 'Votre demande de coaching a bien été envoyée.');
 

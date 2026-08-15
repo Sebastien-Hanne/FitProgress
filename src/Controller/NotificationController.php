@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Notification;
 use App\Entity\User;
 use App\Repository\NotificationRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -35,6 +36,17 @@ final class NotificationController extends AbstractController
         }
         $entityManager->flush();
 
+        return $this->redirectToRoute('app_notifications');
+    }
+
+    #[Route('/{id}/read', name: 'app_notifications_read', requirements: ['id' => '\\d+'], methods: ['POST'])]
+    public function read(Notification $notification, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        if ($notification->getUser() !== $this->getCurrentUser() || !$this->isCsrfTokenValid('notification-read-'.$notification->getId(), $request->request->getString('_token'))) {
+            throw $this->createAccessDeniedException();
+        }
+        $notification->setIsRead(true);
+        $entityManager->flush();
         return $this->redirectToRoute('app_notifications');
     }
 

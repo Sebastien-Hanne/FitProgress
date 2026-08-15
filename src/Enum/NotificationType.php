@@ -3,6 +3,7 @@
 namespace App\Enum;
 
 enum NotificationType: string {
+    case new_coach_request = 'new_coach_request';
     case new_message = 'new_message';
     case session_scheduled = 'session_scheduled';
     case session_modified = 'session_modified';
