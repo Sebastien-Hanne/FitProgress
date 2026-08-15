@@ -45,6 +45,21 @@ final class CoachRequestManagementController extends AbstractController
         return $this->redirectToRoute('app_messages_show', ['id' => $conversation->getId()]);
     }
 
+    #[Route('/{id}/refuser', name: 'reject', requirements: ['id' => '\\d+'], methods: ['POST'])]
+    public function reject(CoachRequest $coachRequest, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $coach = $this->coachUser();
+        if ($coachRequest->getCoachProfile() !== $coach->getCoachProfile() || $coachRequest->getStatus() !== RequestStatus::Pending || !$this->isCsrfTokenValid('reject_coach_request_'.$coachRequest->getId(), $request->request->getString('_token'))) {
+            throw $this->createAccessDeniedException();
+        }
+        $coachRequest->setStatus(RequestStatus::Rejected);
+        $notification = (new Notification())->setUser($coachRequest->getUser())->setType(NotificationType::request_rejected)
+            ->setTitle('Demande refusée')->setContent($coach->getName().' ne peut pas donner suite à votre demande de coaching.');
+        $entityManager->persist($notification);
+        $entityManager->flush();
+        return $this->redirectToRoute('app_coach_requests_index');
+    }
+
     private function coachUser(): User
     {
         $user = $this->getUser();

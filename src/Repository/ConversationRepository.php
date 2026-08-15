@@ -22,14 +22,14 @@ class ConversationRepository extends ServiceEntityRepository
     public function findForParticipant(User $user): array
     {
         return $this->createQueryBuilder('conversation')
-            ->addSelect('member', 'coach', 'coachUser', 'messages', 'sender')
-            ->innerJoin('conversation.user', 'member')
+            ->addSelect('participant', 'coach', 'coachUser', 'messages', 'sender')
+            ->innerJoin('conversation.user', 'participant')
             ->innerJoin('conversation.coachProfile', 'coach')
             ->innerJoin('coach.user', 'coachUser')
-            ->innerJoin('coach.coachRequests', 'coachRequest', 'WITH', 'coachRequest.user = member')
+            ->innerJoin('coach.coachRequests', 'coachRequest', 'WITH', 'coachRequest.user = participant')
             ->leftJoin('conversation.messages', 'messages')
             ->leftJoin('messages.sender', 'sender')
-            ->andWhere('member = :user OR coachUser = :user')
+            ->andWhere('participant = :user OR coachUser = :user')
             ->andWhere('coachRequest.status = :approved')
             ->setParameter('user', $user)
             ->setParameter('approved', RequestStatus::Approved)
