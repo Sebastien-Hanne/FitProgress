@@ -58,6 +58,9 @@ class JournalController extends AbstractController
         PaginatorInterface $paginator,
     ): Response {
         $period = $this->normalizePeriod($request->query->getString('period', '30'));
+        $metric = in_array($request->query->getString('metric', 'weight'), ['weight', 'bmi'], true)
+            ? $request->query->getString('metric', 'weight')
+            : 'weight';
         $since = match ($period) {
             '7' => new \DateTimeImmutable('-6 days'),
             '30' => new \DateTimeImmutable('-29 days'),
@@ -65,16 +68,48 @@ class JournalController extends AbstractController
             default => null,
         };
 
+        $user = $this->getCurrentUser();
+        $filteredEntries = $repository->createHistoryQueryBuilder($user, $since)->getQuery()->getResult();
+        $measurementEntries = array_values(array_filter(
+            $filteredEntries,
+            static fn (JournalEntry $entry): bool => $metric === 'bmi' ? $entry->getBmi() !== null : $entry->getWeight() !== null,
+        ));
+        $measurements = array_map(
+            static fn (JournalEntry $entry): float => (float) ($metric === 'bmi' ? $entry->getBmi() : $entry->getWeight()),
+            $measurementEntries,
+        );
+        $latestMeasurement = $measurements[0] ?? null;
+        $oldestMeasurement = $measurements !== [] ? $measurements[array_key_last($measurements)] : null;
+        $variation = $latestMeasurement !== null && $oldestMeasurement !== null ? $latestMeasurement - $oldestMeasurement : null;
+        $chartEntries = array_reverse(array_slice($measurementEntries, 0, 7));
+        $chartMeasurements = array_map(
+            static fn (JournalEntry $entry): float => (float) ($metric === 'bmi' ? $entry->getBmi() : $entry->getWeight()),
+            $chartEntries,
+        );
+        $chartMin = $chartMeasurements !== [] ? min($chartMeasurements) : 0.0;
+        $chartRange = max(0.1, ($chartMeasurements !== [] ? max($chartMeasurements) : 0.0) - $chartMin);
+
         $entries = $paginator->paginate(
-            $repository->createHistoryQueryBuilder($this->getCurrentUser(), $since),
+            $repository->createHistoryQueryBuilder($user, $since),
             max(1, $request->query->getInt('page', 1)),
-            10,
+            $period === 'all' ? max(1, count($filteredEntries)) : 10,
         );
 
         return $this->render('journal/history.html.twig', [
             'entries' => $entries,
             'period' => $period,
+            'metric' => $metric,
             'today' => new \DateTimeImmutable('today'),
+            'recentEntries' => array_slice($filteredEntries, 0, 5),
+            'chartEntries' => $chartEntries,
+            'chartMin' => $chartMin,
+            'chartRange' => $chartRange,
+            'stats' => [
+                'min' => $measurements !== [] ? min($measurements) : null,
+                'max' => $measurements !== [] ? max($measurements) : null,
+                'average' => $measurements !== [] ? array_sum($measurements) / count($measurements) : null,
+                'variation' => $variation,
+            ],
         ]);
     }
 
