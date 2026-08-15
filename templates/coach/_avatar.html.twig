@@ -1,0 +1,8 @@
+{% set coachUser = coach.user %}
+{% if coachUser.photo %}
+    <img src="{{ asset(coachUser.photo) }}" alt="Portrait de {{ coachUser.name }}" class="h-full w-full object-cover">
+{% else %}
+    <span class="flex h-full w-full items-center justify-center bg-gradient-to-br from-emerald-100 to-teal-600 text-lg font-black text-emerald-950" aria-hidden="true">
+        {{ coachUser.name|split(' ')|map(part => part|first|upper)|join|slice(0, 2) }}
+    </span>
+{% endif %}
