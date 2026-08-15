@@ -1,51 +1,55 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Historique du journal | FitProgress{% endblock %}
-
+{% block title %}Historique d’activité | FitProgress{% endblock %}
 {% block body %}
+{% set periodLabels = {'7': '7 derniers jours', '30': '30 derniers jours', '90': '3 derniers mois', 'all': 'Depuis le début'} %}
+{% set shortDays = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'] %}
+{% set moodIcons = {'very_bad': '☹', 'bad': '☹', 'stable': '😐', 'good': '☺', 'excellent': '☺'} %}
+{% set moodColors = {'very_bad': '#dc2626', 'bad': '#f97316', 'stable': '#ca8a04', 'good': '#10b981', 'excellent': '#059669'} %}
+{% set metricLabel = metric == 'bmi' ? 'IMC' : 'Poids' %}
+{% set metricUnit = metric == 'bmi' ? '' : 'kg' %}
 <div class="fit-page min-h-screen font-sans text-[#1A2B48]" style="background-color:#f7f9fc">
-  <div class="journal-shell pb-24">
     {% include 'components/_app_header.html.twig' %}
+    <main class="mx-auto w-full max-w-5xl px-4 pb-28 pt-6 sm:px-6 lg:pt-10">
+        <header><h1 class="text-2xl font-black tracking-tight lg:text-4xl">Historique d’Activité</h1><p class="mt-1 text-xs leading-5 text-slate-500 lg:text-sm">Analysez votre trajectoire de remise en forme à long terme</p></header>
+        {% for message in app.flashes('success') %}<div class="mt-4 rounded-xl bg-emerald-50 p-4 text-xs font-semibold text-emerald-800">{{ message }}</div>{% endfor %}
+        {% for message in app.flashes('error') %}<div class="mt-4 rounded-xl bg-rose-50 p-4 text-xs font-semibold text-rose-800" role="alert">{{ message }}</div>{% endfor %}
 
-    <main class="journal-main mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 lg:px-10 lg:py-10">
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-                <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-600">Votre progression</p>
-                <h1 class="mt-1 text-2xl font-black lg:text-3xl">Historique du journal</h1>
-            </div>
-            <div class="flex gap-2">
-                <a href="{{ path('app_journal_today') }}" class="flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-center text-[10px] font-extrabold uppercase text-slate-600 sm:flex-none">Journal du jour</a>
-                <a href="{{ path('app_journal_export') }}" class="flex-1 rounded-xl bg-[#1769aa] px-3 py-2.5 text-center text-[10px] font-extrabold uppercase text-white sm:flex-none">Exporter CSV</a>
-            </div>
-        </div>
-
-        {% for message in app.flashes('success') %}<div class="mt-4 rounded-2xl bg-emerald-50 p-4 text-xs font-semibold text-emerald-800">{{ message }}</div>{% endfor %}
-        {% for message in app.flashes('error') %}<div class="mt-4 rounded-2xl bg-rose-50 p-4 text-xs font-semibold text-rose-800" role="alert">{{ message }}</div>{% endfor %}
-
-        <nav class="mt-5 grid grid-cols-4 rounded-2xl bg-slate-100 p-1 text-center text-[10px] font-bold" aria-label="Filtrer l’historique">
-            {% set periods = {'7': '7 jours', '30': '30 jours', '90': '3 mois', 'all': 'Tout'} %}
-            {% for value, label in periods %}
-                <a href="{{ path('app_journal_history', {period: value}) }}" class="rounded-xl px-2 py-2.5 {{ period == value ? 'bg-emerald-500 text-white shadow-sm' : 'text-slate-500' }}">{{ label }}</a>
-            {% endfor %}
+        <nav class="mt-7 flex gap-2 overflow-x-auto pb-1 text-[11px] font-bold" aria-label="Filtrer l’historique">
+            {% for value, label in {'7': 'Semaine', '30': 'Mois', '90': '3 Mois', 'all': 'Tout'} %}<a href="{{ path('app_journal_history', {period: value, metric: metric}) }}" class="shrink-0 rounded-full px-4 py-2.5 {{ period == value ? 'bg-emerald-600 text-white shadow-sm' : 'bg-[#e8efff] text-slate-500' }}" {% if period == value %}aria-current="page"{% endif %}>{{ label }}</a>{% endfor %}
         </nav>
+        <nav class="mt-3 flex gap-2 text-[10px] font-bold text-slate-500" aria-label="Type de mesure"><a href="{{ path('app_journal_history', {period: period, metric: 'weight'}) }}" class="px-5 py-2 {{ metric == 'weight' ? 'border-b-2 border-emerald-600 text-emerald-700' : '' }}">Poids</a><a href="{{ path('app_journal_history', {period: period, metric: 'bmi'}) }}" class="px-5 py-2 {{ metric == 'bmi' ? 'border-b-2 border-emerald-600 text-emerald-700' : '' }}">IMC</a></nav>
 
-        <div class="journal-history-grid mt-5 grid gap-4">
-            {% for entry in entries %}
-                {% include 'journal/_entry_card.html.twig' with {entry: entry, today: today} %}
-            {% else %}
-                <div class="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center">
-                    <p class="text-sm font-bold">Aucune entrée pour cette période.</p>
-                    <a href="{{ path('app_journal_today') }}" class="mt-3 inline-flex rounded-xl bg-emerald-500 px-4 py-3 text-xs font-bold text-white">Remplir le journal</a>
-                </div>
-            {% endfor %}
-        </div>
+        <section class="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4" aria-label="Statistiques de poids">
+            {% set cards = [
+                [metricLabel ~ ' Min', stats.min, 'Minimum historique', '↘', 'text-emerald-600'],
+                [metricLabel ~ ' Max', stats.max, 'Maximum historique', '↗', 'text-rose-500'],
+                ['Moyenne', stats.average, periodLabels[period], '▣', 'text-indigo-500'],
+                ['Variation Totale', stats.variation is null ? null : stats.variation|abs, stats.variation is not null and stats.variation <= 0 ? 'Progrès constants' : 'Évolution sur la période', stats.variation is not null and stats.variation <= 0 ? '☺' : '↗', stats.variation is not null and stats.variation <= 0 ? 'text-emerald-600' : 'text-amber-600']
+            ] %}
+            {% for card in cards %}<article class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"><h2 class="text-xs font-medium text-slate-500">{{ card[0] }}</h2><p class="mt-3 text-3xl font-black">{{ card[1] is not null ? card[1]|number_format(1, ',', ' ') : '—' }}{% if card[1] is not null and metricUnit %} <small class="text-xs font-bold text-slate-500">{{ metricUnit }}</small>{% endif %}</p><p class="mt-2 text-[10px] {{ card[4] }}">{{ card[3] }} {{ card[2] }}</p></article>{% endfor %}
+        </section>
 
-        {% if entries.pageCount > 1 %}
-            <div class="mt-6 flex justify-center">{{ knp_pagination_render(entries, '@KnpPaginator/Pagination/tailwindcss_pagination.html.twig') }}</div>
-        {% endif %}
+        <section class="mt-5 rounded-xl border border-slate-200 bg-white p-5 shadow-sm" aria-labelledby="trend-title">
+            <div class="flex items-center justify-between gap-4"><h2 id="trend-title" class="text-sm font-black">Analyse de Tendance</h2><span class="rounded-full bg-slate-100 px-3 py-1 text-[9px] font-bold text-slate-600">{{ periodLabels[period] }}</span></div>
+            {% if chartEntries is not empty %}<div class="mt-7 flex h-56 items-end justify-around gap-2 border-b border-slate-100 px-2" role="img" aria-label="Graphique de l’évolution du poids">
+                {% for entry in chartEntries %}{% set value = metric == 'bmi' ? entry.bmi : entry.weight %}{% set height = 25 + (((value - chartMin) / chartRange) * 65) %}<div class="flex h-full min-w-0 flex-1 flex-col items-center justify-end"><span class="mb-2 text-[9px] font-bold text-slate-500">{{ value|number_format(1, ',', ' ') }}</span><div class="w-1.5 rounded-t-full {{ loop.last ? 'bg-emerald-600' : 'bg-emerald-200' }}" style="height:{{ height }}%"></div><span class="mt-3 text-[9px] font-bold">{{ shortDays[entry.date|date('w')] }}</span></div>{% endfor %}
+            </div>{% else %}<div class="flex h-48 items-center justify-center text-center text-xs text-slate-500">Ajoutez une pesée dans votre journal pour afficher la tendance.</div>{% endif %}
+        </section>
+
+        <section class="mt-5 rounded-xl border border-slate-200 bg-white p-4 shadow-sm" aria-labelledby="recent-title">
+            <h2 id="recent-title" class="mb-3 text-xs font-medium text-slate-500">Journaux Récents</h2><div class="overflow-x-auto"><table class="w-full min-w-[28rem] text-left text-[10px]"><thead class="bg-slate-50 text-[9px] font-bold uppercase tracking-wider text-slate-500"><tr><th class="px-3 py-3">Date</th><th class="px-3 py-3">{{ metricLabel }}</th><th class="px-3 py-3 text-center">Humeur</th></tr></thead><tbody class="divide-y divide-slate-100">
+            {% for entry in recentEntries %}{% set mood = entry.mood ? entry.mood.value : null %}{% set recentValue = metric == 'bmi' ? entry.bmi : entry.weight %}<tr><td class="px-3 py-3 font-bold">{{ entry.date|date('d/m') }}<small class="block font-normal text-slate-400">{{ entry.date|date('Y') }}</small></td><td class="px-3 py-3">{{ recentValue is not null ? recentValue|number_format(1, ',', ' ') ~ (metricUnit ? ' ' ~ metricUnit : '') : '—' }}</td><td class="px-3 py-3 text-center text-base" style="color:{{ moodColors[mood]|default('#94a3b8') }}">{{ moodIcons[mood]|default('—') }}</td></tr>{% else %}<tr><td colspan="3" class="p-6 text-center text-slate-500">Aucun journal pour cette période.</td></tr>{% endfor %}
+            </tbody></table></div>
+        </section>
+
+        <section id="complete-history" class="mt-5 scroll-mt-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm" aria-labelledby="complete-title">
+            <h2 id="complete-title" class="mb-3 text-xs font-medium text-slate-500">Journal de Progrès Complet</h2><div class="overflow-x-auto"><table class="w-full min-w-[34rem] text-left text-[10px]"><thead class="bg-slate-50 text-[9px] font-bold text-slate-500"><tr><th class="px-3 py-3">Horodatage</th><th class="px-3 py-3">Poids (kg)</th><th class="px-3 py-3">IMC</th><th class="px-3 py-3 text-right">Action</th></tr></thead><tbody class="divide-y divide-slate-100">
+            {% for entry in entries %}<tr><td class="px-3 py-3">{{ entry.date|date('d/m/Y') }}</td><td class="px-3 py-3 font-bold text-emerald-700">{{ entry.weight ? entry.weight|number_format(1, ',', ' ') : '—' }}</td><td class="px-3 py-3">{{ entry.bmi ? entry.bmi|number_format(1, ',', ' ') : '—' }}</td><td class="px-3 py-3 text-right">{% if entry.date|date('Y-m-d') == today|date('Y-m-d') %}<a href="{{ path('app_journal_edit', {id: entry.id}) }}" class="font-bold text-indigo-600">Modifier</a>{% else %}<span class="text-slate-300">—</span>{% endif %}</td></tr>{% else %}<tr><td colspan="4" class="p-6 text-center text-slate-500">Aucune donnée disponible.</td></tr>{% endfor %}
+            </tbody></table></div>
+            {% if entries.pageCount > 1 %}<div class="mt-4 flex justify-center">{{ knp_pagination_render(entries, '@KnpPaginator/Pagination/tailwindcss_pagination.html.twig') }}</div>{% endif %}{% if period != 'all' %}<a href="{{ path('app_journal_history', {period: 'all', metric: metric}) }}#complete-history" class="mt-4 flex justify-center text-[10px] font-bold text-emerald-700">Voir tout l’historique →</a>{% else %}<p class="mt-4 text-center text-[10px] font-bold text-emerald-700">Tout l’historique est affiché</p>{% endif %}
+        </section>
+        <div class="mt-5 grid grid-cols-2 gap-3"><a href="{{ path('app_journal_today') }}" class="rounded-xl border border-slate-200 bg-white px-4 py-3 text-center text-xs font-bold">Journal du jour</a><a href="{{ path('app_journal_export') }}" class="rounded-xl bg-[#1769aa] px-4 py-3 text-center text-xs font-bold text-white">Exporter CSV</a></div>
     </main>
-
     {% include 'components/_app_navigation.html.twig' with {active: 'history', compact: true} %}
-  </div>
 </div>
 {% endblock %}
