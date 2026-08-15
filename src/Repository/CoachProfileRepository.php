@@ -16,6 +16,52 @@ class CoachProfileRepository extends ServiceEntityRepository
         parent::__construct($registry, CoachProfile::class);
     }
 
+    /** @return CoachProfile[] */
+    public function findAvailable(?string $search = null, ?string $specialty = null): array
+    {
+        $qb = $this->createQueryBuilder('coach')
+            ->innerJoin('coach.user', 'user')
+            ->addSelect('user')
+            ->andWhere('coach.isAvailable = true')
+            ->andWhere('user.isDeleted = false')
+            ->andWhere('user.isProfileVisible = true')
+            ->orderBy('user.name', 'ASC');
+
+        if ($search !== null && $search !== '') {
+            $qb->andWhere('LOWER(user.name) LIKE :search OR LOWER(coach.specialties) LIKE :search')
+                ->setParameter('search', '%'.mb_strtolower($search).'%');
+        }
+
+        if ($specialty !== null && $specialty !== '') {
+            $qb->andWhere('LOWER(coach.specialties) LIKE :specialty')
+                ->setParameter('specialty', '%'.mb_strtolower($specialty).'%');
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /** @return string[] */
+    public function findAvailableSpecialties(): array
+    {
+        $rows = $this->createQueryBuilder('coach')
+            ->select('coach.specialties')
+            ->andWhere('coach.isAvailable = true')
+            ->andWhere('coach.specialties IS NOT NULL')
+            ->getQuery()->getSingleColumnResult();
+
+        $specialties = [];
+        foreach ($rows as $row) {
+            foreach (preg_split('/[,;]+/', $row) ?: [] as $item) {
+                if (($item = trim($item)) !== '') {
+                    $specialties[mb_strtolower($item)] = $item;
+                }
+            }
+        }
+        natcasesort($specialties);
+
+        return array_values($specialties);
+    }
+
 //    /**
 //     * @return CoachProfile[] Returns an array of CoachProfile objects
 //     */

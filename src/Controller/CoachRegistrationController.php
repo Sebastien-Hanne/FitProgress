@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\CoachProfile;
 use App\Entity\User;
 use App\Form\CoachRegistrationFormType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -44,8 +45,21 @@ class CoachRegistrationController extends AbstractController
                 'coach_' . bin2hex(random_bytes(8)) . '@fitprogress.local'
             );
 
-            // 4. Sauvegarde en BDD
+            // 4. Création du profil visible dans l'annuaire des coachs
+            $specialties = array_values(array_filter(array_map(
+                'trim',
+                (array) $request->request->all('specialities')
+            )));
+            $coachProfile = (new CoachProfile())
+                ->setUser($user)
+                ->setSpecialties($specialties !== [] ? implode(', ', $specialties) : 'Coaching sportif')
+                ->setBio('Coach FitProgress disponible pour vous accompagner vers vos objectifs.')
+                ->setIsAvailable(true);
+            $user->setCoachProfile($coachProfile);
+
+            // 5. Sauvegarde en BDD
             $entityManager->persist($user);
+            $entityManager->persist($coachProfile);
             $entityManager->flush();
 
             $logger->info('Nouveau coach inscrit : ' . $user->getEmail());
