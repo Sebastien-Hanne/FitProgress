@@ -40,7 +40,7 @@
 <div class="fit-page fit-text min-h-screen font-sans" id="accessibility-page">
     {% include 'components/_app_header.html.twig' %}
     <main class="accessibility-main space-y-6 px-4 pb-28 pt-5">
-        <a href="{{ path('app_profile') }}" class="accessibility-title" aria-label="Retour au profil"><span class="accessibility-back" aria-hidden="true">←</span><span>Retour au profil</span></a>
+        <a href="{{ path(is_granted('ROLE_COACH') and not is_granted('ROLE_ADMIN') ? 'app_coach_space_profile' : 'app_profile') }}" class="accessibility-title" aria-label="Retour au profil"><span class="accessibility-back" aria-hidden="true">←</span><span>Retour au profil</span></a>
         <p class="sr-only" aria-live="polite" id="accessibility-status"></p>
         <div class="accessibility-introduction">
             <p class="accessibility-eyebrow">Accessibilité</p>
@@ -68,7 +68,7 @@
             <div class="accessibility-row"><div class="accessibility-copy"><strong>Sous-titres pour vidéos</strong><small>Active les sous-titres par défaut pour les futurs entraînements vidéo.</small></div><label><span class="sr-only">Sous-titres pour vidéos</span><input id="accessibility-captions" type="checkbox" class="sr-only" aria-label="Activer ou désactiver les sous-titres"><span class="accessibility-switch"></span></label></div>
         </section>
     </main>
-    {% include 'components/_app_navigation.html.twig' with {active: 'profile'} %}
+    {% if is_granted('ROLE_COACH') and not is_granted('ROLE_ADMIN') %}{% include 'components/_coach_navigation.html.twig' with {active:'profile'} %}{% else %}{% include 'components/_app_navigation.html.twig' with {active: 'profile'} %}{% endif %}
 </div>
 <script>
 (() => {

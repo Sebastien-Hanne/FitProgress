@@ -42,6 +42,9 @@ final class JournalEntryAccessTest extends WebTestCase
         self::assertResponseIsSuccessful();
         self::assertStringNotContainsString('private-entry-'.$suffix, $client->getResponse()->getContent() ?: '');
 
+        $client->request('GET', sprintf('/journal/%d', $entryId));
+        self::assertResponseStatusCodeSame(404);
+
         $client->request('GET', sprintf('/journal/%d/edit', $entryId));
         self::assertResponseStatusCodeSame(404);
         $this->assertEntryIsUnchanged($entryId, $userAId, $suffix);

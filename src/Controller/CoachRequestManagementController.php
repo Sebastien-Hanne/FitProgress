@@ -23,7 +23,12 @@ final class CoachRequestManagementController extends AbstractController
     public function index(CoachRequestRepository $requests): Response
     {
         $coach = $this->coachUser();
-        return $this->render('coach/requests.html.twig', ['requests' => $requests->findBy(['coachProfile' => $coach->getCoachProfile()], ['createdAt' => 'DESC'])]);
+        return $this->render('coach/requests.html.twig', [
+            'requests' => $requests->findBy([
+                'coachProfile' => $coach->getCoachProfile(),
+                'status' => RequestStatus::Pending,
+            ], ['createdAt' => 'DESC']),
+        ]);
     }
 
     #[Route('/{id}/accepter', name: 'accept', requirements: ['id' => '\\d+'], methods: ['POST'])]

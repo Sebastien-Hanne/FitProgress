@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Repository\FeedbackRepository;
 use App\Repository\JournalEntryRepository;
 use App\Repository\NotificationRepository;
+use App\Repository\CoachRequestRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -24,6 +25,7 @@ class HomeController extends AbstractController
         JournalEntryRepository $journalEntries,
         FeedbackRepository $feedbacks,
         NotificationRepository $notifications,
+        CoachRequestRepository $coachRequests,
     ): Response
     {
         $user = $this->getUser();
@@ -52,7 +54,13 @@ class HomeController extends AbstractController
         $daysSinceWeighIn = $latest?->getDate()
             ? max(0, (int) $latest->getDate()->diff(new \DateTimeImmutable('today'))->format('%r%a'))
             : null;
-        $latestFeedback = $feedbacks->findOneBy(['user' => $user], ['createdAt' => 'DESC']);
+        $currentCoachRequest = $coachRequests->findCurrentForUser($user);
+        $activeCoachProfile = $currentCoachRequest?->getStatus() === \App\Enum\RequestStatus::Approved
+            ? $currentCoachRequest->getCoachProfile()
+            : null;
+        $latestFeedback = $activeCoachProfile
+            ? $feedbacks->findOneBy(['user' => $user, 'coachProfile' => $activeCoachProfile], ['createdAt' => 'DESC'])
+            : null;
         $latestNotification = $notifications->findOneBy(['user' => $user], ['createdAt' => 'DESC']);
         $coachName = $latestFeedback?->getCoachProfile()?->getUser()?->getName();
 
@@ -121,9 +129,16 @@ class HomeController extends AbstractController
     }
 
     #[Route('/coach/dashboard', name: 'coach_dashboard', methods: ['GET'])]
-    public function coachDashboard(): Response
+    public function coachDashboard(CoachRequestRepository $requests, FeedbackRepository $feedbacks): Response
     {
-        return new Response('Tableau de bord coach en cours de développement.');
+        $user = $this->getUser();
+        if (!$user instanceof User) throw $this->createAccessDeniedException();
+        $profile = $user->getCoachProfile();
+        return $this->render('coach_space/clients.html.twig', [
+            'clientRequests' => $profile ? $requests->findApprovedForCoach($profile) : [], 'search' => '',
+            'pendingCount' => $profile ? $requests->count(['coachProfile' => $profile, 'status' => \App\Enum\RequestStatus::Pending]) : 0,
+            'feedbackCount' => $profile ? $feedbacks->count(['coachProfile' => $profile]) : 0,
+        ]);
     }
 
     #[Route('/admin/dashboard', name: 'admin_dashboard', methods: ['GET'])]

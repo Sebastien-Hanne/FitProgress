@@ -46,7 +46,7 @@ final class CoachMatchingController extends AbstractController
     #[Route('/{id}', name: 'show', requirements: ['id' => '\\d+'], methods: ['GET'])]
     public function show(CoachProfile $coach, CoachRequestRepository $requests): Response
     {
-        if (!$coach->isAvailable() || !$coach->getUser()?->isProfileVisible()) {
+        if (!$coach->isAvailable() || $coach->getUser()?->isDeleted() !== false) {
             throw $this->createNotFoundException('Ce coach n’est pas disponible.');
         }
 
@@ -63,7 +63,7 @@ final class CoachMatchingController extends AbstractController
         if (!$this->isCsrfTokenValid('coach_request_'.$coach->getId(), (string) $request->request->get('_token'))) {
             throw $this->createAccessDeniedException('Jeton de sécurité invalide.');
         }
-        if (!$coach->isAvailable() || !$coach->getUser()?->isProfileVisible()) {
+        if (!$coach->isAvailable() || $coach->getUser()?->isDeleted() !== false) {
             $this->addFlash('error', 'Ce coach n’est plus disponible.');
             return $this->redirectToRoute('app_coach_index');
         }
@@ -116,6 +116,26 @@ final class CoachMatchingController extends AbstractController
             $coachRequest->setStatus(RequestStatus::Cancelled);
             $entityManager->flush();
             $this->addFlash('success', 'Votre demande a été annulée.');
+        }
+
+        return $this->redirectToRoute('app_coach_status');
+    }
+
+    #[Route('/demande/{id}/arreter', name: 'stop', requirements: ['id' => '\\d+'], methods: ['POST'])]
+    public function stop(CoachRequest $coachRequest, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        if ($coachRequest->getUser() !== $this->requireUser()) {
+            throw $this->createAccessDeniedException();
+        }
+        if (!$this->isCsrfTokenValid('stop_coaching_'.$coachRequest->getId(), (string) $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Jeton de sécurité invalide.');
+        }
+        if ($coachRequest->getStatus() !== RequestStatus::Approved) {
+            $this->addFlash('error', 'Cet accompagnement n’est pas actif.');
+        } else {
+            $coachRequest->setStatus(RequestStatus::Cancelled);
+            $entityManager->flush();
+            $this->addFlash('success', 'Votre accompagnement avec ce coach est terminé.');
         }
 
         return $this->redirectToRoute('app_coach_status');

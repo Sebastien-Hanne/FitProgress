@@ -8,15 +8,19 @@
     </a>
 
     <div class="flex items-center gap-2">
-        <button type="button" class="relative flex size-9 items-center justify-center rounded-full bg-slate-50 text-[#1A2B48] transition hover:bg-slate-100" aria-label="Notifications de démonstration">
+        {% if app.user %}
+        <a href="{{ path('app_notifications') }}" class="relative flex size-9 items-center justify-center rounded-full bg-slate-50 text-[#1A2B48] transition hover:bg-slate-100" aria-label="Voir mes notifications">
             <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 17H9m9-2V9a6 6 0 10-12 0v6l-2 2h16l-2-2zM10 21h4"/>
             </svg>
-            <span class="absolute right-1.5 top-1.5 size-2 rounded-full border-2 border-white bg-emerald-500"></span>
-        </button>
-        <div class="flex size-9 items-center justify-center rounded-full bg-[#1A2B48] text-xs font-bold text-white" aria-label="Avatar fictif de Léa">
-            L
-        </div>
+        </a>
+        {% set profileRoute = is_granted('ROLE_COACH') and not is_granted('ROLE_ADMIN') ? 'app_coach_space_profile' : 'app_profile' %}
+        <a href="{{ path(profileRoute) }}" class="flex size-9 items-center justify-center overflow-hidden rounded-full bg-[#1A2B48] text-xs font-bold text-white transition hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2" aria-label="Voir le profil de {{ app.user.name }}">
+            {% if app.user.photo %}<img src="{{ asset(app.user.photo) }}" alt="" class="size-full object-cover">{% else %}{{ app.user.name|first|upper }}{% endif %}
+        </a>
+        {% else %}
+        <a href="{{ path('app_login') }}" class="rounded-xl bg-[#1A2B48] px-4 py-2 text-xs font-bold text-white transition hover:bg-emerald-700">Connexion</a>
+        {% endif %}
     </div>
 </div>
 </header>

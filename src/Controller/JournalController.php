@@ -113,6 +113,14 @@ class JournalController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}', name: 'app_journal_show', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function show(int $id, JournalEntryRepository $repository): Response
+    {
+        $entry = $repository->findOneForUser($this->getCurrentUser(), $id);
+        if (!$entry) throw $this->createNotFoundException('Entrée du journal introuvable.');
+        return $this->render('journal/show.html.twig', ['entry' => $entry, 'coachView' => false]);
+    }
+
     #[Route('/{id}/edit', name: 'app_journal_edit', requirements: ['id' => '\\d+'], methods: ['GET', 'POST'])]
     public function edit(
         int $id,
@@ -180,7 +188,12 @@ class JournalController extends AbstractController
     #[Route('/export.csv', name: 'app_journal_export', methods: ['GET'])]
     public function export(JournalEntryRepository $repository): StreamedResponse
     {
-        $entries = $repository->findAllForUser($this->getCurrentUser());
+        $user = $this->getCurrentUser();
+        if (in_array('ROLE_COACH', $user->getRoles(), true) && !in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+            throw $this->createAccessDeniedException('L’export du journal est réservé aux clients.');
+        }
+
+        $entries = $repository->findAllForUser($user);
 
         $response = new StreamedResponse(static function () use ($entries): void {
             $output = fopen('php://output', 'wb');

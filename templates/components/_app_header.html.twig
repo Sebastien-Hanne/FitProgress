@@ -5,12 +5,13 @@
             <span class="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-emerald-50">
                 <img src="{{ asset('img/logo.png') }}" alt="" class="h-8 w-8 scale-[2.4] object-cover object-center">
             </span>
-            <span class="truncate text-sm font-black tracking-tight lg:text-base">FitProgress</span>
+            <span class="truncate text-sm font-black tracking-tight text-[#1A2B48] lg:text-base">FitProgress</span>
         </a>
 
         <div class="flex items-center gap-2.5">
-            <a href="{{ path('app_profile') }}" class="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-[11px] font-black text-white shadow-md shadow-emerald-500/20 transition hover:bg-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2" aria-label="Voir le profil de {{ app.user and app.user.name ? app.user.name : 'l’utilisateur' }}">
-                {{ app.user and app.user.name ? app.user.name|first|upper : 'U' }}
+            {% set profileRoute = is_granted('ROLE_COACH') and not is_granted('ROLE_ADMIN') ? 'app_coach_space_profile' : 'app_profile' %}
+            <a href="{{ path(profileRoute) }}" class="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-emerald-500 text-[11px] font-black text-white shadow-md shadow-emerald-500/20 transition hover:bg-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2" aria-label="Voir le profil de {{ app.user and app.user.name ? app.user.name : 'l’utilisateur' }}">
+                {% if app.user and app.user.photo %}<img src="{{ asset(app.user.photo) }}" alt="" class="size-full object-cover">{% else %}{{ app.user and app.user.name ? app.user.name|first|upper : 'U' }}{% endif %}
             </a>
             {% set unreadMessages = unread_message_count() %}
             <a href="{{ path('app_messages_index') }}" class="relative flex h-8 w-8 items-center justify-center rounded-full bg-slate-50 text-[#1A2B48] hover:bg-emerald-50 hover:text-emerald-700" aria-label="Messagerie, {{ unreadMessages }} message{{ unreadMessages != 1 ? 's' }} non lu{{ unreadMessages != 1 ? 's' }}">
