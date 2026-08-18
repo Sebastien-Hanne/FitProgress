@@ -81,6 +81,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?Goal $goal = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: JournalEntry::class, orphanRemoval: true)]
+    #[ORM\OrderBy(['date' => 'ASC'])]
     private Collection $journalEntries;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: CoachRequest::class, orphanRemoval: true)]

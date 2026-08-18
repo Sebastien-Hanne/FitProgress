@@ -112,11 +112,18 @@ final class ProfileFeaturesTest extends WebTestCase
         $crawler = $client->request('GET', '/notifications');
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('body', 'Nouveau retour du coach');
+        self::assertSelectorExists('form[action="/notifications/'.$notificationId.'/delete"]');
         $client->submit($crawler->selectButton('Tout marquer comme lu')->form());
         self::assertResponseRedirects('/notifications');
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
         $updatedNotification = $entityManager->find(Notification::class, $notificationId);
         self::assertTrue($updatedNotification?->isRead());
+
+        $crawler = $client->request('GET', '/notifications');
+        $client->submit($crawler->selectButton('Supprimer la notification : Nouveau retour du coach')->form());
+        self::assertResponseRedirects('/notifications');
+        self::getContainer()->get(EntityManagerInterface::class)->clear();
+        self::assertNull(self::getContainer()->get(EntityManagerInterface::class)->find(Notification::class, $notificationId));
     }
 
     public function testAccountDeletionRequiresPasswordAndDeletesUser(): void
@@ -138,6 +145,28 @@ final class ProfileFeaturesTest extends WebTestCase
         self::assertResponseRedirects('/login');
         self::getContainer()->get(EntityManagerInterface::class)->clear();
         self::assertNull(self::getContainer()->get(EntityManagerInterface::class)->find(User::class, $userId));
+    }
+
+    public function testCoachDoesNotSeeClientVisibilitySetting(): void
+    {
+        $client = self::createClient();
+        $coach = (new User())
+            ->setEmail('coach-'.bin2hex(random_bytes(6)).'@example.test')
+            ->setProxyEmail('coach-proxy-'.bin2hex(random_bytes(6)).'@example.test')
+            ->setName('Coach Test')
+            ->setPassword('unused')
+            ->setRoles(['ROLE_COACH']);
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        $entityManager->persist($coach);
+        $entityManager->flush();
+        $client->loginUser($coach);
+
+        $client->request('GET', '/profile/privacy');
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextNotContains('body', 'Visibilité du compte');
+        self::assertSelectorTextNotContains('body', 'Partager avec les coachs');
+        self::assertSelectorTextNotContains('body', 'Exporter mon journal');
     }
 
     /** @return array{User, string} */

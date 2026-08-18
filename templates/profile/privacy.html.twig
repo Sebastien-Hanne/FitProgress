@@ -30,7 +30,7 @@
 <div class="fit-page fit-text min-h-screen font-sans">
     {% include 'components/_app_header.html.twig' %}
     <main class="privacy-main px-4 pb-28 pt-7">
-        <a href="{{ path('app_profile') }}" class="privacy-back" aria-label="Retour au profil"><span aria-hidden="true">←</span><span>Retour au profil</span></a>
+        <a href="{{ path(is_granted('ROLE_COACH') and not is_granted('ROLE_ADMIN') ? 'app_coach_space_profile' : 'app_profile') }}" class="privacy-back" aria-label="Retour au profil"><span aria-hidden="true">←</span><span>Retour au profil</span></a>
         <div class="privacy-introduction">
             <p class="text-[10px] font-extrabold uppercase tracking-[.2em] text-emerald-600">Confidentialité</p>
             <h1 class="mt-3 text-3xl font-black leading-tight">Vos données,<br>votre contrôle</h1>
@@ -40,19 +40,23 @@
         {% for message in app.flashes('success') %}<p class="mt-5 rounded-xl bg-emerald-50 p-3 text-xs font-bold text-emerald-700">{{ message }}</p>{% endfor %}
         {% for message in app.flashes('delete_error') %}<p class="mt-5 rounded-xl bg-red-50 p-3 text-xs font-bold text-red-700">{{ message }}</p>{% endfor %}
 
-        <section class="privacy-section" aria-labelledby="visibility-title">
-            <h2 id="visibility-title" class="mb-3 text-[10px] font-extrabold uppercase tracking-wider">◉ Visibilité du compte</h2>
-            <form method="post" class="privacy-card flex items-center gap-4 p-4">
-                <div class="flex-1"><strong class="block text-xs">Partager avec les coachs</strong><p class="mt-1 text-[10px] leading-4 text-slate-500">Permet à votre entraîneur de consulter votre journal et vos graphiques de progression.</p></div>
-                <label class="cursor-pointer"><span class="sr-only">Partager mon profil avec les coachs</span><input type="checkbox" name="is_profile_visible" value="1" class="sr-only" onchange="this.form.submit()" {{ app.user.profileVisible ? 'checked' : '' }}><span class="privacy-switch block"></span></label>
-                <input type="hidden" name="_token" value="{{ csrf_token('profile-visibility') }}">
-            </form>
-        </section>
+        {% if not (is_granted('ROLE_COACH') and not is_granted('ROLE_ADMIN')) %}
+            <section class="privacy-section" aria-labelledby="visibility-title">
+                <h2 id="visibility-title" class="mb-3 text-[10px] font-extrabold uppercase tracking-wider">◉ Visibilité du compte</h2>
+                <form method="post" class="privacy-card flex items-center gap-4 p-4">
+                    <div class="flex-1"><strong class="block text-xs">Partager avec les coachs</strong><p class="mt-1 text-[10px] leading-4 text-slate-500">Permet à votre entraîneur de consulter votre journal et vos graphiques de progression.</p></div>
+                    <label class="cursor-pointer"><span class="sr-only">Partager mon profil avec les coachs</span><input type="checkbox" name="is_profile_visible" value="1" class="sr-only" onchange="this.form.submit()" {{ app.user.profileVisible ? 'checked' : '' }}><span class="privacy-switch block"></span></label>
+                    <input type="hidden" name="_token" value="{{ csrf_token('profile-visibility') }}">
+                </form>
+            </section>
+        {% endif %}
 
         <section class="privacy-section" aria-labelledby="data-title">
             <h2 id="data-title" class="mb-3 text-[10px] font-extrabold uppercase tracking-wider">▤ Gestion des données</h2>
             <div class="privacy-card overflow-hidden">
-                <a href="{{ path('app_journal_export') }}" class="privacy-data-row hover:bg-slate-50"><span>⇩</span><span class="flex-1">Exporter mon journal (CSV)</span><span class="text-slate-300">›</span></a>
+                {% if not (is_granted('ROLE_COACH') and not is_granted('ROLE_ADMIN')) %}
+                    <a href="{{ path('app_journal_export') }}" class="privacy-data-row hover:bg-slate-50"><span>⇩</span><span class="flex-1">Exporter mon journal (CSV)</span><span class="text-slate-300">›</span></a>
+                {% endif %}
                 <a href="{{ path('app_legal_privacy') }}" class="privacy-data-row hover:bg-slate-50"><span>ⓘ</span><span class="flex-1">Politique de confidentialité</span><span class="text-slate-300">›</span></a>
                 <a href="{{ path('app_legal_terms') }}" class="privacy-data-row hover:bg-slate-50"><span>§</span><span class="flex-1">Conditions d’utilisation</span><span class="text-slate-300">›</span></a>
                 <button type="button" class="privacy-data-row is-danger" onclick="document.getElementById('delete-account-confirmation').hidden = !document.getElementById('delete-account-confirmation').hidden"><span>☒</span><span class="flex-1">Supprimer le compte</span><span>›</span></button>
@@ -69,6 +73,6 @@
 
         <section class="privacy-protection text-center"><span class="privacy-protection-icon">♙</span><strong class="mt-4 block text-xs">Vos données sont protégées</strong><p class="mx-auto mt-2 max-w-sm text-[10px] leading-4 text-slate-500">FitProgress met en œuvre le hachage des mots de passe, une protection CSRF et des accès sécurisés par rôle pour protéger vos données.</p></section>
     </main>
-    {% include 'components/_app_navigation.html.twig' with {active: 'profile'} %}
+    {% if is_granted('ROLE_COACH') and not is_granted('ROLE_ADMIN') %}{% include 'components/_coach_navigation.html.twig' with {active:'profile'} %}{% else %}{% include 'components/_app_navigation.html.twig' with {active: 'profile'} %}{% endif %}
 </div>
 {% endblock %}

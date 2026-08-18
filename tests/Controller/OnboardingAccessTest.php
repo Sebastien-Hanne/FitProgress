@@ -69,7 +69,7 @@ final class OnboardingAccessTest extends WebTestCase
 
         $client->request('GET', '/logout');
 
-        self::assertResponseRedirects('/login');
+        self::assertResponseRedirects('/');
     }
 
     #[DataProvider('publicLegalRoutes')]

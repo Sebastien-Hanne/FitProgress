@@ -24,7 +24,6 @@ class CoachProfileRepository extends ServiceEntityRepository
             ->addSelect('user')
             ->andWhere('coach.isAvailable = true')
             ->andWhere('user.isDeleted = false')
-            ->andWhere('user.isProfileVisible = true')
             ->orderBy('user.name', 'ASC');
 
         if ($search !== null && $search !== '') {

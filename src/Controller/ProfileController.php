@@ -29,6 +29,9 @@ final class ProfileController extends AbstractController
         if (!$user instanceof User) {
             throw $this->createAccessDeniedException();
         }
+        if (in_array('ROLE_COACH', $user->getRoles(), true) && !in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+            return $this->redirectToRoute('app_coach_space_profile');
+        }
 
         $entries = $journalEntryRepository->findAllForUser($user);
         $weighIns = array_values(array_filter(
@@ -78,27 +81,30 @@ final class ProfileController extends AbstractController
     {
         $user = $this->getCurrentUser();
         $goal = $user->getGoal();
+        $isCoach = in_array('ROLE_COACH', $user->getRoles(), true) && !in_array('ROLE_ADMIN', $user->getRoles(), true);
         $form = $this->createForm(ProfileAccountType::class, $user, [
             'method' => 'POST',
+            'show_health_fields' => !$isCoach,
         ]);
-        $form->get('heightCm')->setData($goal?->getHeightCm());
-        $form->get('targetWeight')->setData($goal?->getTargetWeight());
-        $form->get('birthDate')->setData($goal?->getBirthDate());
-        $form->get('gender')->setData($goal?->getGender());
+        if (!$isCoach) {
+            $form->get('heightCm')->setData($goal?->getHeightCm());
+            $form->get('targetWeight')->setData($goal?->getTargetWeight());
+            $form->get('birthDate')->setData($goal?->getBirthDate());
+            $form->get('gender')->setData($goal?->getGender());
+        }
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($goal === null) {
+            if (!$isCoach && $goal === null) {
                 $goal = (new Goal())->setUser($user);
                 $user->setGoal($goal);
                 $entityManager->persist($goal);
             }
 
-            $goal
-                ->setHeightCm((int) $form->get('heightCm')->getData())
-                ->setTargetWeight((string) $form->get('targetWeight')->getData())
-                ->setBirthDate($form->get('birthDate')->getData())
-                ->setGender($form->get('gender')->getData());
+            if (!$isCoach) {
+                $goal->setHeightCm((int) $form->get('heightCm')->getData())->setTargetWeight((string) $form->get('targetWeight')->getData())
+                    ->setBirthDate($form->get('birthDate')->getData())->setGender($form->get('gender')->getData());
+            }
             if ($photo = $form->get('photoFile')->getData()) {
                 $oldPhoto = $user->getPhoto();
                 $user->setPhoto($photoUploader->upload($photo));
@@ -169,6 +175,10 @@ final class ProfileController extends AbstractController
         $user = $this->getCurrentUser();
 
         if ($request->isMethod('POST')) {
+            if (in_array('ROLE_COACH', $user->getRoles(), true) && !in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+                throw $this->createAccessDeniedException('Ce réglage est réservé aux clients.');
+            }
+
             if (!$this->isCsrfTokenValid('profile-visibility', $request->request->getString('_token'))) {
                 throw $this->createAccessDeniedException('Jeton de sécurité invalide.');
             }
