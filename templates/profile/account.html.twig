@@ -73,7 +73,7 @@
                 <h2 id="personal-title" class="mb-3 text-[10px] font-extrabold uppercase tracking-wider text-emerald-700">Informations personnelles</h2>
                 <div class="account-card px-4">
                     <div class="account-row flex items-center gap-3 py-4"><span class="flex size-8 items-center justify-center rounded bg-emerald-50">♙</span><div class="flex-1"><strong class="block text-[10px]">Nom complet</strong><span class="text-xs text-slate-600">{{ app.user.name }}</span></div><button type="button" class="account-pencil" data-edit-field="profile_account_name" aria-label="Modifier mon nom" title="Modifier mon nom">✎</button></div>
-                    <div class="account-row flex gap-3 py-4"><span class="flex size-8 items-center justify-center rounded bg-emerald-50">✉</span><div><strong class="block text-[10px]">Adresse e-mail</strong><span class="text-xs text-slate-600">{{ app.user.email }}</span></div></div>
+                    <div class="account-row flex items-center gap-3 py-4"><span class="flex size-8 items-center justify-center rounded bg-emerald-50">✉</span><div class="flex-1"><strong class="block text-[10px]">Adresse e-mail</strong><span class="text-xs text-slate-600">{{ app.user.email }}</span></div><a href="{{ path('app_profile_email') }}" class="rounded-lg bg-emerald-50 px-3 py-2 text-[10px] font-black text-emerald-700">Modifier mon adresse e-mail</a></div>
                     <div class="account-row flex gap-3 py-4"><span class="flex size-8 items-center justify-center rounded bg-emerald-50">☎</span><div><strong class="block text-[10px]">Numéro de téléphone</strong><span class="text-xs text-slate-600">{{ app.user.phone ?: 'Non renseigné' }}</span></div></div>
                 </div>
             </section>
@@ -105,7 +105,7 @@
                 <div class="mb-5 flex items-center justify-between gap-4"><h2 id="edit-profile-title" class="text-sm font-black">Modifier mes informations</h2><button id="account-edit-close" type="button" class="account-edit-close" aria-label="Fermer la fenêtre">×</button></div>
                 {{ form_start(accountForm) }}
                     <div class="account-form-grid">
-                        {% set accountFields = [accountForm.name, accountForm.email, accountForm.phone, accountForm.photoFile] %}{% if accountForm.heightCm is defined %}{% set accountFields = accountFields|merge([accountForm.heightCm, accountForm.targetWeight, accountForm.birthDate, accountForm.gender]) %}{% endif %}
+                        {% set accountFields = [accountForm.name, accountForm.phone, accountForm.photoFile] %}{% if accountForm.heightCm is defined %}{% set accountFields = accountFields|merge([accountForm.heightCm, accountForm.targetWeight, accountForm.birthDate, accountForm.gender]) %}{% endif %}
                         {% for field in accountFields %}
                             <div class="account-field">{{ form_label(field) }}{{ form_widget(field) }}{{ form_errors(field) }}</div>
                         {% endfor %}

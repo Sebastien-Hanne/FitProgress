@@ -19,5 +19,6 @@ final class MessageControllerTest extends WebTestCase
     {
         yield 'conversation list' => ['/messages'];
         yield 'conversation thread' => ['/messages/999999'];
+        yield 'user sessions' => ['/sessions'];
     }
 }

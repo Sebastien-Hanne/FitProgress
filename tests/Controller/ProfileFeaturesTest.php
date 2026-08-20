@@ -23,9 +23,11 @@ final class ProfileFeaturesTest extends WebTestCase
 
         $crawler = $client->request('GET', '/profile/account');
         self::assertResponseIsSuccessful();
+        $originalEmail = $user->getEmail();
+        self::assertSelectorNotExists('#profile_account_email');
+        self::assertSelectorExists('a[href="/profile/email"]');
         $form = $crawler->selectButton('Enregistrer les modifications')->form([
             'profile_account[name]' => 'Nom Modifié',
-            'profile_account[email]' => 'modified-'.bin2hex(random_bytes(5)).'@example.test',
             'profile_account[phone]' => '+33 6 12 34 56 78',
             'profile_account[heightCm]' => '182',
             'profile_account[targetWeight]' => '76.0',
@@ -37,11 +39,38 @@ final class ProfileFeaturesTest extends WebTestCase
         self::assertResponseRedirects('/profile/account');
         $updatedUser = self::getContainer()->get(EntityManagerInterface::class)->find(User::class, $userId);
         self::assertSame('Nom Modifié', $updatedUser?->getName());
+        self::assertSame($originalEmail, $updatedUser?->getEmail());
         self::assertSame('+33 6 12 34 56 78', $updatedUser?->getPhone());
         self::assertSame(182, $updatedUser?->getGoal()?->getHeightCm());
         self::assertSame(80.0, (float) $updatedUser?->getGoal()?->getInitialWeight());
         self::assertSame(Gender::Male, $updatedUser?->getGoal()?->getGender());
         self::assertFalse($crawler->filter('#profile_account_initialWeight')->count() > 0);
+    }
+
+    public function testEmailChangeUsesTheDedicatedSecureFlow(): void
+    {
+        $client = self::createClient();
+        [$user, $plainPassword] = $this->createUserWithGoal(true);
+        $userId = $user->getId();
+        $originalEmail = $user->getEmail();
+        $newEmail = 'new-profile-'.bin2hex(random_bytes(6)).'@example.test';
+        $client->loginUser($user);
+
+        $crawler = $client->request('GET', '/profile/email');
+        self::assertResponseIsSuccessful();
+        $client->submit($crawler->selectButton('Envoyer le lien de confirmation')->form([
+            'change_email_form[newEmail]' => $newEmail,
+            'change_email_form[currentPassword]' => $plainPassword,
+        ]));
+
+        self::assertResponseRedirects('/profile/account');
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        $entityManager->clear();
+        $updatedUser = $entityManager->find(User::class, $userId);
+        self::assertSame($originalEmail, $updatedUser?->getEmail());
+        self::assertSame($newEmail, $updatedUser?->getPendingEmail());
+        self::assertNotNull($updatedUser?->getEmailChangeToken());
+        self::assertNotNull($updatedUser?->getEmailChangeExpiresAt());
     }
 
     public function testAddingAJournalWeightDoesNotChangeInitialWeight(): void
@@ -100,7 +129,7 @@ final class ProfileFeaturesTest extends WebTestCase
         [$user] = $this->createUserWithGoal();
         $notification = (new Notification())
             ->setUser($user)
-            ->setType(NotificationType::new_feedback)
+            ->setType(NotificationType::certificate_approved)
             ->setTitle('Nouveau retour du coach')
             ->setContent('Votre coach a ajouté un commentaire.');
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);

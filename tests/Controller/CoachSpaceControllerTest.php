@@ -23,6 +23,8 @@ final class CoachSpaceControllerTest extends WebTestCase
         yield ['/coach/clients'];
         yield ['/coach/profil'];
         yield ['/coach/demandes'];
+        yield ['/coach/schedule'];
+        yield ['/coach/schedule/new'];
     }
 
     public function testCoachCanOpenClientListAndProfile(): void
@@ -62,6 +64,17 @@ final class CoachSpaceControllerTest extends WebTestCase
         self::assertSelectorTextContains('#professional-title', 'Activité professionnelle');
         self::assertSelectorTextNotContains('body', 'Profil physique');
         self::assertSelectorExists('nav[aria-label="Navigation coach"]');
+
+        $client->request('GET', '/coach/schedule');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('h1', 'Planning de Coaching');
+        self::assertSelectorExists('a[href="/coach/schedule/new"]');
+
+        $client->request('GET', '/coach/schedule/new');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('form[name="coach_session"]');
+        self::assertSelectorExists('#coach_session_user');
+        self::assertSelectorExists('#coach_session_startAt');
 
         $client->request('GET', '/notifications');
         self::assertResponseIsSuccessful();

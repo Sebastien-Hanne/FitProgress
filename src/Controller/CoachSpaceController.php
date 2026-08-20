@@ -4,14 +4,18 @@ namespace App\Controller;
 
 use App\Entity\Feedback;
 use App\Entity\Notification;
+use App\Entity\Session;
 use App\Entity\User;
 use App\Enum\NotificationType;
 use App\Enum\RequestStatus;
+use App\Enum\SessionStatus;
 use App\Form\CoachFeedbackType;
 use App\Form\CoachProfileType;
+use App\Form\CoachSessionType;
 use App\Repository\CoachRequestRepository;
 use App\Repository\FeedbackRepository;
 use App\Repository\JournalEntryRepository;
+use App\Repository\SessionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -94,9 +98,99 @@ final class CoachSpaceController extends AbstractController
     }
 
     #[Route('/schedule', name: 'schedule', methods: ['GET'])]
-    public function schedule(): Response
+    public function schedule(SessionRepository $sessions): Response
     {
-        return $this->render('coach_space/schedule.html.twig', ['sessions' => $this->coach()->getCoachProfile()->getSessions()]);
+        return $this->render('coach_space/schedule.html.twig', [
+            'sessions' => $sessions->findForCoach($this->coach()->getCoachProfile()),
+        ]);
+    }
+
+    #[Route('/schedule/new', name: 'schedule_new', methods: ['GET', 'POST'])]
+    public function scheduleNew(Request $request, CoachRequestRepository $requests, EntityManagerInterface $entityManager): Response
+    {
+        $coach = $this->coach()->getCoachProfile();
+        $clients = array_map(static fn ($coachRequest): User => $coachRequest->getUser(), $requests->findApprovedForCoach($coach));
+        $session = (new Session())
+            ->setCoachProfile($coach)
+            ->setTitle('Séance de coaching')
+            ->setStartAt(new \DateTimeImmutable('tomorrow 09:00'));
+        $form = $this->createForm(CoachSessionType::class, $session, ['clients' => $clients])->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($session);
+            $entityManager->flush();
+            $this->addFlash('success', 'La séance a été planifiée.');
+
+            return $this->redirectToRoute('app_coach_space_schedule');
+        }
+
+        return $this->render('coach_space/session_form.html.twig', [
+            'sessionForm' => $form,
+            'pageTitle' => 'Planifier une séance',
+            'submitLabel' => 'Planifier la séance',
+        ]);
+    }
+
+    #[Route('/schedule/{id}/edit', name: 'schedule_edit', requirements: ['id' => '\\d+'], methods: ['GET', 'POST'])]
+    public function scheduleEdit(Session $session, Request $request, CoachRequestRepository $requests, EntityManagerInterface $entityManager): Response
+    {
+        $coach = $this->coach()->getCoachProfile();
+        $this->assertSessionOwner($session);
+        if ($session->getStatus() !== SessionStatus::Scheduled) {
+            throw $this->createAccessDeniedException('Seule une séance planifiée peut être modifiée.');
+        }
+        $clients = array_map(static fn ($coachRequest): User => $coachRequest->getUser(), $requests->findApprovedForCoach($coach));
+        $form = $this->createForm(CoachSessionType::class, $session, ['clients' => $clients])->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
+            $this->addFlash('success', 'La séance a été modifiée.');
+
+            return $this->redirectToRoute('app_coach_space_schedule');
+        }
+
+        return $this->render('coach_space/session_form.html.twig', [
+            'sessionForm' => $form,
+            'pageTitle' => 'Modifier la séance',
+            'submitLabel' => 'Enregistrer les modifications',
+        ]);
+    }
+
+    #[Route('/schedule/{id}/cancel', name: 'schedule_cancel', requirements: ['id' => '\\d+'], methods: ['POST'])]
+    public function scheduleCancel(Session $session, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $this->changeSessionStatus($session, SessionStatus::Cancelled, $request, $entityManager, 'cancel');
+        $this->addFlash('success', 'La séance a été annulée.');
+
+        return $this->redirectToRoute('app_coach_space_schedule');
+    }
+
+    #[Route('/schedule/{id}/complete', name: 'schedule_complete', requirements: ['id' => '\\d+'], methods: ['POST'])]
+    public function scheduleComplete(Session $session, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $this->changeSessionStatus($session, SessionStatus::Completed, $request, $entityManager, 'complete');
+        $this->addFlash('success', 'La séance est marquée comme terminée.');
+
+        return $this->redirectToRoute('app_coach_space_schedule');
+    }
+
+    private function changeSessionStatus(Session $session, SessionStatus $status, Request $request, EntityManagerInterface $entityManager, string $action): void
+    {
+        $this->assertSessionOwner($session);
+        if ($session->getStatus() !== SessionStatus::Scheduled
+            || !$this->isCsrfTokenValid($action.'_session_'.$session->getId(), $request->request->getString('_token'))
+        ) {
+            throw $this->createAccessDeniedException();
+        }
+        $session->setStatus($status);
+        $entityManager->flush();
+    }
+
+    private function assertSessionOwner(Session $session): void
+    {
+        if ($session->getCoachProfile() !== $this->coach()->getCoachProfile()) {
+            throw $this->createAccessDeniedException();
+        }
     }
 
     private function coach(): User
