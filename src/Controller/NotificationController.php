@@ -90,6 +90,7 @@ final class NotificationController extends AbstractController
 
         return match ($notification->getType()) {
             NotificationType::new_message, NotificationType::request_accepted => $this->redirectToRoute('app_messages_index'),
+            NotificationType::session_scheduled, NotificationType::session_modified, NotificationType::session_cancelled => $this->redirectToRoute('app_user_sessions'),
             NotificationType::new_feedback => $this->redirectToRoute('app_feedback'),
             NotificationType::new_coach_request => $this->redirectToRoute('app_coach_requests_index'),
             default => $this->redirectToRoute('app_notifications'),

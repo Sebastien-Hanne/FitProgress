@@ -1,11 +1,31 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Password Reset Email Sent{% endblock %}
+{% block title %}Consultez votre boîte mail - FitProgress{% endblock %}
 
 {% block body %}
-    <p>
-        If an account matching your email exists, then an email was just sent that contains a link that you can use to reset your password.
-        This link will expire in {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.
-    </p>
-    <p>If you don't receive an email please check your spam folder or <a href="{{ path('app_forgot_password_request') }}">try again</a>.</p>
+<div class="min-h-screen bg-[#f4f7f9] flex flex-col font-sans">
+    <header class="w-full bg-white px-5 py-3 flex items-center justify-between border-b border-slate-100 shadow-sm">
+        <a href="{{ path('app_home') }}" class="flex items-center space-x-3" aria-label="FitProgress, retour à l’accueil">
+            <img src="{{ asset('img/logo.png') }}" alt="" class="w-9 h-9 object-contain">
+            <span class="text-xl font-bold text-slate-800 tracking-tight">FitProgress</span>
+        </a>
+    </header>
+
+    <main class="flex-1 flex items-center justify-center px-4 py-8">
+        <section class="w-full max-w-md bg-white rounded-2xl p-7 shadow-sm border border-slate-100 text-center" aria-labelledby="confirmation-title">
+            <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#e6f7f3] text-[#10b981]">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+            </div>
+            <h1 id="confirmation-title" class="text-2xl font-extrabold text-[#0f172a]">Consultez votre boîte mail</h1>
+            <div class="mt-4 space-y-3 text-sm leading-6 text-slate-600">
+                <p>Si un compte correspondant à cette adresse existe, un e-mail contenant un lien de réinitialisation vient de vous être envoyé.</p>
+                <p>Ce lien est valable pendant {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.</p>
+                <p>Si vous ne recevez pas l’e-mail, vérifiez vos courriers indésirables ou <a href="{{ path('app_forgot_password_request') }}" class="font-bold text-emerald-700 hover:text-emerald-800">effectuez une nouvelle demande</a>.</p>
+            </div>
+            <a href="{{ path('app_login') }}" class="mt-7 inline-flex w-full items-center justify-center rounded-xl bg-[#10b981] px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0e9f6e]">Revenir à la connexion</a>
+        </section>
+    </main>
+</div>
 {% endblock %}
