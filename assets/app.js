@@ -69,5 +69,3 @@ document.addEventListener('focusin', (event) => {
 
     speakAccessibilityText(label);
 });
-
-console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
