@@ -3,8 +3,10 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
+        <title>{% block title %}FitProgress — Suivez vos progrès{% endblock %}</title>
+        <meta name="description" content="{% block meta_description %}FitProgress vous aide à suivre votre poids, vos habitudes et vos objectifs avec un accompagnement personnalisé.{% endblock %}">
+        <meta name="theme-color" content="#00b887">
+        <link rel="icon" type="image/png" href="{{ asset('img/logo-small.png') }}">
         {% block stylesheets %}
         {% endblock %}
         <style>

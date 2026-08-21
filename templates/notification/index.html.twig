@@ -10,12 +10,25 @@
 {% for notification in notifications %}
     {% set notificationDay = notification.createdAt|date('Y-m-d') %}{% set group = notificationDay == today ? "Aujourd'hui" : (notificationDay == yesterday ? 'Hier' : notification.createdAt|date('d F Y')) %}
     {% if group != currentGroup %}{% if not loop.first %}</section>{% endif %}<h2 class="mb-3 mt-6 text-sm font-bold text-slate-500">{{ group }}</h2><section class="grid gap-3" aria-label="Notifications du {{ group }}">{% set currentGroup = group %}{% endif %}
-    {% set icon = notification.type.value in ['new_message'] ? '✉' : (notification.type.value in ['new_coach_request', 'request_accepted', 'request_rejected'] ? '♟' : (notification.type.value starts with 'session_' ? '▣' : '✓')) %}
     {% set iconClass = notification.type.value == 'request_rejected' or notification.type.value == 'session_cancelled' ? 'bg-rose-100 text-rose-700' : (notification.type.value starts with 'session_' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-500 text-white') %}
     {% set opensContent = notification.type.value in ['new_message', 'new_feedback', 'new_coach_request', 'request_accepted'] %}
     <article class="relative flex items-center gap-3 rounded-xl border bg-white p-4 shadow-sm transition {{ notification.read ? 'border-slate-200' : 'border-emerald-300 ring-1 ring-emerald-100' }} {{ opensContent ? 'hover:border-emerald-400 hover:shadow-md' : '' }}">
     {% if opensContent %}<a href="{{ path('app_notifications_open', {id: notification.id}) }}" class="flex min-w-0 flex-1 items-center gap-4 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500" aria-label="Ouvrir : {{ notification.title }}">{% else %}<div class="flex min-w-0 flex-1 items-center gap-4">{% endif %}
-        <span class="flex size-10 shrink-0 items-center justify-center rounded-full text-lg {{ iconClass }}" aria-hidden="true">{{ icon }}</span>
+        <span class="flex size-10 shrink-0 items-center justify-center rounded-full {{ iconClass }}" aria-hidden="true">
+            {% if notification.type.value == 'new_message' %}
+                <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5h16v12H8l-4 3V5zM8 9h8m-8 4h5"/></svg>
+            {% elseif notification.type.value in ['new_coach_request', 'request_accepted', 'request_rejected'] %}
+                <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path stroke-linecap="round" stroke-linejoin="round" d="M3.5 20a5.5 5.5 0 0111 0M16 8h5m-2.5-2.5V11"/></svg>
+            {% elseif notification.type.value == 'session_cancelled' %}
+                <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="15" rx="2"/><path stroke-linecap="round" d="M8 3v4m8-4v4M4 10h16m-7 3 4 4m0-4-4 4"/></svg>
+            {% elseif notification.type.value == 'session_modified' %}
+                <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="15" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M8 3v4m8-4v4M4 10h16m-9 7 4-4 2 2-4 4h-2v-2z"/></svg>
+            {% elseif notification.type.value == 'session_scheduled' %}
+                <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="15" rx="2"/><path stroke-linecap="round" d="M8 3v4m8-4v4M4 10h16m-8 3v5m-2.5-2.5h5"/></svg>
+            {% else %}
+                <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" stroke-linejoin="round" d="m8 12 2.5 2.5L16 9"/></svg>
+            {% endif %}
+        </span>
         <div class="min-w-0 flex-1"><div class="flex items-start justify-between gap-3"><h3 class="text-sm font-black">{{ notification.title }}</h3><time class="shrink-0 text-[9px] text-slate-400" datetime="{{ notification.createdAt|date('c') }}">{{ notificationDay in [today, yesterday] ? notification.createdAt|date('H:i') : notification.createdAt|date('d/m') }}</time></div><p class="mt-1 text-sm leading-5 text-slate-600">{{ notification.content }}</p>{% if not notification.read and not opensContent %}<form method="post" action="{{ path('app_notifications_read', {id: notification.id}) }}" class="mt-2"><input type="hidden" name="_token" value="{{ csrf_token('notification-read-' ~ notification.id) }}"><button class="text-[10px] font-bold text-emerald-700">Marquer comme lue</button></form>{% endif %}</div>
     {% if opensContent %}</a>{% else %}</div>{% endif %}
     <form method="post" action="{{ path('app_notifications_delete', {id: notification.id}) }}" class="shrink-0" onsubmit="return confirm('Supprimer cette notification ?')">
@@ -28,6 +41,6 @@
     {% if not notification.read %}<span class="absolute right-3 top-2 size-2 rounded-full bg-emerald-500" aria-label="Non lue"></span>{% endif %}
     </article>
     {% if loop.last %}</section>{% endif %}
-{% else %}<div class="py-24 text-center"><span class="text-5xl text-slate-300">✓✓</span><h2 class="mt-5 font-black">Vous êtes à jour !</h2><p class="mt-2 text-sm text-slate-500">Aucune notification pour le moment.</p></div>{% endfor %}
+{% else %}<div class="py-24 text-center"><span class="mx-auto flex size-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-600" aria-hidden="true"><svg class="size-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 18H9m9-3V9a6 6 0 10-12 0v6l-2 3h16l-2-3zM9 12l2 2 4-4"/></svg></span><h2 class="mt-5 font-black">Vous êtes à jour !</h2><p class="mt-2 text-sm text-slate-500">Aucune notification pour le moment.</p></div>{% endfor %}
 </div></main>{% if is_granted('ROLE_COACH') and not is_granted('ROLE_ADMIN') %}{% include 'components/_coach_navigation.html.twig' with {active: ''} %}{% else %}{% include 'components/_app_navigation.html.twig' with {active: 'profile'} %}{% endif %}</div>
 {% endblock %}

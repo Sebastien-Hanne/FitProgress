@@ -77,8 +77,8 @@
                 <section class="profile-statistics" aria-labelledby="statistics-title">
                     <h2 id="statistics-title" class="text-center text-xs font-black">Mes statistiques</h2>
                     <div class="profile-stat-grid mt-3 gap-4">
-                        <div class="rounded-xl border border-emerald-100 bg-emerald-50 p-5 text-center"><span class="mx-auto flex size-10 items-center justify-center rounded-full bg-emerald-100 text-xl" aria-hidden="true">⚖</span><strong class="mt-2 block text-lg text-emerald-700">{{ profile.weighInsCount }}</strong><span class="text-[0.5625rem] text-slate-500">Pesées</span></div>
-                        <div class="rounded-xl border border-indigo-100 bg-indigo-50 p-5 text-center"><span class="mx-auto flex size-10 items-center justify-center rounded-full bg-indigo-100 text-xl" aria-hidden="true">▣</span><strong class="mt-2 block text-lg text-indigo-700">{{ profile.trackedDays }}</strong><span class="text-[0.5625rem] text-slate-500">Jours suivis</span></div>
+                        <div class="rounded-xl border border-emerald-100 bg-emerald-50 p-5 text-center"><span class="mx-auto flex size-10 items-center justify-center rounded-full bg-emerald-100 text-emerald-700" aria-hidden="true"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 7h14M7 7l-4 7h8L7 7zm10 0-4 7h8l-4-7zM9 20h6"/></svg></span><strong class="mt-2 block text-lg text-emerald-700">{{ profile.weighInsCount }}</strong><span class="text-[0.5625rem] text-slate-500">Pesées</span></div>
+                        <div class="rounded-xl border border-indigo-100 bg-indigo-50 p-5 text-center"><span class="mx-auto flex size-10 items-center justify-center rounded-full bg-indigo-100 text-indigo-700" aria-hidden="true"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="15" rx="2"/><path stroke-linecap="round" d="M8 3v4m8-4v4M4 10h16m-12 4h3m2 0h3m-8 3h3"/></svg></span><strong class="mt-2 block text-lg text-indigo-700">{{ profile.trackedDays }}</strong><span class="text-[0.5625rem] text-slate-500">Jours suivis</span></div>
                     </div>
                 </section>
 
@@ -98,13 +98,33 @@
 
             <section class="profile-settings border-y border-slate-200 bg-white" aria-labelledby="settings-title">
                 <h2 id="settings-title" class="px-5 py-4 text-center text-xs font-black">Paramètres &amp; Préférences</h2>
-                {% set settings = [['⚙', 'Paramètres du compte', path('app_profile_account')]] %}
-                {% if is_granted('ROLE_COACH') %}{% set settings = settings|merge([['⌁', 'Demandes de coaching', path('app_coach_requests_index')]]) %}{% else %}{% set settings = settings|merge([['⌁', 'Mon coach', path('app_coach_status')]]) %}{% endif %}
-                {% set settings = settings|merge([['✉', 'Messagerie', path('app_messages_index')], ['♧', 'Notifications', path('app_notifications')], ['▣', 'Confidentialité', path('app_profile_privacy')], ['◉', 'Accessibilité', path('app_accessibility')]]) %}
-                {% for setting in settings %}<a href="{{ setting[2] }}" class="flex w-full items-center gap-3 border-t border-slate-100 px-5 py-4 text-left text-xs transition hover:bg-slate-50"><span aria-hidden="true">{{ setting[0] }}</span><span class="flex-1">{{ setting[1] }}</span><span class="text-slate-300" aria-hidden="true">›</span></a>{% endfor %}
+                {% set settings = [['account', 'Paramètres du compte', path('app_profile_account')]] %}
+                {% if is_granted('ROLE_COACH') %}{% set settings = settings|merge([['coach', 'Demandes de coaching', path('app_coach_requests_index')]]) %}{% else %}{% set settings = settings|merge([['coach', 'Mon coach', path('app_coach_status')]]) %}{% endif %}
+                {% set settings = settings|merge([['messages', 'Messagerie', path('app_messages_index')], ['notifications', 'Notifications', path('app_notifications')], ['privacy', 'Confidentialité', path('app_profile_privacy')], ['accessibility', 'Accessibilité', path('app_accessibility')]]) %}
+                {% for setting in settings %}
+                    <a href="{{ setting[2] }}" class="group flex w-full items-center gap-3 border-t border-slate-100 px-5 py-4 text-left text-xs transition hover:bg-slate-50">
+                        <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 transition group-hover:bg-emerald-100" aria-hidden="true">
+                            {% if setting[0] == 'account' %}
+                                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3"/><path stroke-linecap="round" stroke-linejoin="round" d="M6.5 20a5.5 5.5 0 0111 0M19 8.5v-3m-1.5 1.5h3"/></svg>
+                            {% elseif setting[0] == 'coach' %}
+                                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path stroke-linecap="round" stroke-linejoin="round" d="M3.5 20a5.5 5.5 0 0111 0M16 8h5m-2.5-2.5V11"/></svg>
+                            {% elseif setting[0] == 'messages' %}
+                                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5h16v12H8l-4 3V5zM8 9h8m-8 4h5"/></svg>
+                            {% elseif setting[0] == 'notifications' %}
+                                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 18H9m9-3V9a6 6 0 10-12 0v6l-2 3h16l-2-3zM10 21h4"/></svg>
+                            {% elseif setting[0] == 'privacy' %}
+                                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3l7 3v5c0 4.7-2.9 8.4-7 10-4.1-1.6-7-5.3-7-10V6l7-3z"/><path stroke-linecap="round" d="M9 12l2 2 4-4"/></svg>
+                            {% else %}
+                                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="4.5" r="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M12 8v5m0 0-4 7m4-7 4 7"/></svg>
+                            {% endif %}
+                        </span>
+                        <span class="flex-1">{{ setting[1] }}</span>
+                        <svg class="size-4 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m9 18 6-6-6-6"/></svg>
+                    </a>
+                {% endfor %}
             </section>
 
-            <div class="profile-footer-actions px-4 py-7 text-center"><a href="{{ path('app_logout') }}" class="profile-logout flex w-full items-center justify-center rounded-xl border-2 px-4 py-3 text-xs font-bold transition">Déconnexion</a><p class="mt-5 text-[0.5625rem] text-slate-400">Version 1.4.0</p></div>
+            <div class="profile-footer-actions px-4 py-7 text-center"><a href="{{ path('app_logout') }}" class="profile-logout flex w-full items-center justify-center gap-2 rounded-xl border-2 px-4 py-3 text-xs font-bold transition"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M10 5H5v14h5m4-4 4-3-4-3m4 3H9"/></svg><span>Déconnexion</span></a><p class="mt-5 text-[0.5625rem] text-slate-400">Version 1.4.0</p></div>
         </main>
 
         {% include 'components/_app_navigation.html.twig' with {active: 'profile'} %}
