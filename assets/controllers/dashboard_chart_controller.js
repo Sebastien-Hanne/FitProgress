@@ -13,6 +13,8 @@ export default class extends Controller {
 
     connect() {
         this.renderChart(this.labelsValue, this.weightsValue);
+        this.resizeChart = () => this.chart?.resize();
+        window.addEventListener('resize', this.resizeChart);
     }
 
     showMonth() {
@@ -92,6 +94,7 @@ export default class extends Controller {
     }
 
     disconnect() {
+        window.removeEventListener('resize', this.resizeChart);
         this.chart?.destroy();
     }
 }

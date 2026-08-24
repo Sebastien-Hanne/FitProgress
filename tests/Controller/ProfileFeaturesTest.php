@@ -172,6 +172,9 @@ final class ProfileFeaturesTest extends WebTestCase
         $form = $crawler->selectButton('Supprimer définitivement mon compte')->form(['password' => $plainPassword]);
         $client->submit($form);
         self::assertResponseRedirects('/login');
+        $client->followRedirect();
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('form');
         self::getContainer()->get(EntityManagerInterface::class)->clear();
         self::assertNull(self::getContainer()->get(EntityManagerInterface::class)->find(User::class, $userId));
     }

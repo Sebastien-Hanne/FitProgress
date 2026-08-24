@@ -4,14 +4,23 @@ export default class extends Controller {
     static targets = ['alert', 'dialog', 'dialogTitle', 'dialogContent', 'notificationDot'];
 
     connect() {
-        if (this.hasAlertTarget && sessionStorage.getItem('fitprogress-weight-alert-dismissed') === 'true') {
-            this.alertTarget.remove();
-        }
+        sessionStorage.removeItem('fitprogress-weight-alert-dismissed');
+        sessionStorage.removeItem('fitprogress-weight-alert-dismissed-on');
     }
 
-    dismissAlert() {
-        sessionStorage.setItem('fitprogress-weight-alert-dismissed', 'true');
-        this.alertTarget.remove();
+    async dismissAlert(event) {
+        const button = event.currentTarget;
+        const body = new URLSearchParams({ _token: button.dataset.dismissToken });
+
+        const response = await fetch(button.dataset.dismissUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+            body,
+        });
+
+        if (response.ok && this.hasAlertTarget) {
+            this.alertTarget.remove();
+        }
     }
 
     open(event) {

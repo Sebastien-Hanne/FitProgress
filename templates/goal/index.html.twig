@@ -13,7 +13,7 @@
 
         <section aria-labelledby="goal-title">
             <span class="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-1 text-[10px] font-extrabold uppercase tracking-wide text-emerald-700">
-                <span aria-hidden="true">⚑</span> Objectif actif
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 21V4m0 0h10l-1.5 3L15 10H5"/></svg> Objectif actif
             </span>
             <h1 id="goal-title" class="mt-4 text-2xl font-black leading-tight sm:text-3xl">
                 Cible : <span class="text-emerald-500">{{ goal.targetWeight|number_format(0, ',', ' ') }} kg</span>{% if goal.targetDate %} d’ici le {{ goal.targetDate|date('d/m/Y') }}{% endif %}
@@ -36,17 +36,17 @@
 
         <section class="grid grid-cols-2 gap-3" aria-label="Résumé de l’objectif">
             <article class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                <div class="flex items-center justify-between text-xs text-slate-500"><span>Kilos<br>restants</span><span class="text-emerald-600">▣</span></div>
+                <div class="flex items-center justify-between text-xs text-slate-500"><span>Kilos<br>restants</span><span class="flex size-8 items-center justify-center rounded-full bg-emerald-50 text-emerald-600"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 7h14l1 14H4L5 7Z"/><path stroke-linecap="round" d="M9 7a3 3 0 0 1 6 0m-3 4 2-2"/></svg></span></div>
                 <p class="mt-3 text-3xl font-black">{{ remainingWeight|number_format(1, ',', ' ') }} <small class="text-xs font-bold text-slate-500">kg</small></p>
             </article>
             <article class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                <div class="flex items-center justify-between text-xs text-slate-500"><span>Jours<br>restants</span><span class="text-amber-600">□</span></div>
+                <div class="flex items-center justify-between text-xs text-slate-500"><span>Jours<br>restants</span><span class="flex size-8 items-center justify-center rounded-full bg-amber-50 text-amber-600"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 3v3m12-3v3M4 9h16M5 5h14a2 2 0 0 1 2 2v13H3V7a2 2 0 0 1 2-2Z"/></svg></span></div>
                 <p class="mt-3 text-3xl font-black">{{ daysRemaining ?? '—' }} <small class="text-xs font-bold text-slate-500">jours</small></p>
             </article>
         </section>
 
         <section class="mt-5 rounded-xl border border-slate-200 bg-white p-5 shadow-sm" aria-labelledby="edit-goal-title">
-            <h2 id="edit-goal-title" class="flex items-center gap-2 text-base font-black"><span aria-hidden="true">≡</span> Modifier l’Objectif</h2>
+            <h2 id="edit-goal-title" class="flex items-center gap-2 text-base font-black"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m4 20 4.5-1 10-10a2.1 2.1 0 0 0-3-3l-10 10L4 20Z"/><path stroke-linecap="round" d="m14 7 3 3"/></svg> Modifier l’Objectif</h2>
             {{ form_start(goalForm, {attr: {class: 'mt-5 grid gap-4'}}) }}
                 <div>
                     {{ form_label(goalForm.targetWeight, null, {label_attr: {class: 'mb-2 block text-xs font-medium'}}) }}
@@ -64,18 +64,18 @@
 
         <section class="mt-5 rounded-xl border border-slate-200 bg-white p-5 shadow-sm" aria-labelledby="goal-history-title">
             <div class="flex items-center justify-between">
-                <h2 id="goal-history-title" class="flex items-center gap-2 text-base font-black"><span class="text-indigo-600" aria-hidden="true">◷</span> Historique</h2>
+                <h2 id="goal-history-title" class="flex items-center gap-2 text-base font-black"><svg width="18" height="18" class="text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12a9 9 0 1 0 3-6.7L3 8m0-5v5h5"/><path stroke-linecap="round" d="M12 7v5l3 2"/></svg> Historique</h2>
                 <span class="text-xs font-bold text-emerald-700">Voir tout</span>
             </div>
             <div class="mt-4 grid gap-3">
                 <article class="flex items-center gap-3 rounded-lg bg-emerald-50/70 p-3">
-                    <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">✓</span>
+                    <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6"/></svg></span>
                     <div class="min-w-0 flex-1"><h3 class="text-sm font-bold">Objectif en cours</h3><p class="mt-1 text-[10px] text-slate-500">{{ currentWeight|number_format(1, ',', ' ') }} kg actuellement · Cible {{ goal.targetWeight|number_format(1, ',', ' ') }} kg</p></div>
                     <span class="self-start text-[10px] font-extrabold text-emerald-700">Actif</span>
                 </article>
                 {% for item in history %}
                     <article class="flex items-center gap-3 rounded-lg bg-slate-50 p-3">
-                        <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-700">□</span>
+                        <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-700"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16v13H4V7Zm3-3h10l2 3H5l2-3Z"/><path stroke-linecap="round" d="M9 12h6"/></svg></span>
                         <div class="min-w-0 flex-1"><h3 class="text-sm font-bold">Ancienne cible</h3><p class="mt-1 text-[10px] text-slate-500">Cible {{ item.targetWeight|number_format(1, ',', ' ') }} kg{% if item.targetDate %} · {{ item.targetDate|date('d/m/Y') }}{% endif %}</p></div>
                         <span class="self-start text-[10px] font-extrabold text-slate-500">Archivé</span>
                     </article>

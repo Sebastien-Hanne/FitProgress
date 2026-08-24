@@ -32,7 +32,7 @@
                     <h1 class="text-xs font-extrabold">Pensez à vous peser</h1>
                     <p class="mt-0.5 text-[10px] leading-4">{% if dashboard.daysSinceWeighIn is null %}Aucune pesée n’a encore été enregistrée.{% else %}Aucune pesée n’a été enregistrée depuis {{ dashboard.daysSinceWeighIn }} jour{{ dashboard.daysSinceWeighIn > 1 ? 's' : '' }}.{% endif %} La régularité, c’est la clé !</p>
                 </div>
-                <button type="button" class="flex size-8 shrink-0 items-center justify-center rounded-full text-lg leading-none text-rose-500 transition hover:bg-rose-100 hover:text-rose-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400" aria-label="Fermer le rappel de pesée" data-action="dashboard-actions#dismissAlert">×</button>
+                <button type="button" class="flex size-8 shrink-0 items-center justify-center rounded-full text-lg leading-none text-rose-500 transition hover:bg-rose-100 hover:text-rose-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400" aria-label="Fermer le rappel de pesée" data-action="dashboard-actions#dismissAlert" data-dismiss-url="{{ path('app_dashboard_dismiss_weight_reminder') }}" data-dismiss-token="{{ csrf_token('dismiss-weight-reminder') }}">×</button>
             </section>{% endif %}
 
             <section class="dashboard-weight dashboard-stat-card flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-4 text-center shadow-sm lg:col-span-5 lg:rounded-[2rem] lg:border-slate-100 lg:p-6 lg:shadow-[0_16px_45px_rgba(26,43,72,0.07)]" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center" aria-labelledby="weight-title">
@@ -94,20 +94,13 @@
             </section>
 
             <section class="dashboard-actions grid gap-2 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm lg:col-span-4 lg:gap-3 lg:rounded-[2rem] lg:border-slate-100 lg:p-6 lg:shadow-[0_16px_45px_rgba(26,43,72,0.06)]" aria-label="Actions rapides">
-                {% set actions = [
-                    ['Chat', 'Chat', dashboard.coachName ? 'Votre messagerie avec ' ~ dashboard.coachName ~ ' est disponible.' : 'Aucun coach n’est encore associé à votre profil.', 'chat']
-                ] %}
                 <button type="button" class="fit-action-button flex w-full items-center justify-center rounded-xl px-4 py-3 text-[10px] font-extrabold uppercase tracking-wide transition" style="background-color:#1769aa;color:#ffffff" data-action="dashboard-actions#exportCsv">
                     Export CSV
                 </button>
                 <a href="{{ path('app_coach_index') }}" class="fit-action-button flex w-full items-center justify-center rounded-xl px-4 py-3 text-[10px] font-extrabold uppercase tracking-wide transition" style="background-color:#1769aa;color:#ffffff">
                     Choisir un coach
                 </a>
-                {% for action in actions %}
-                    <button type="button" class="fit-action-button flex w-full items-center justify-center rounded-xl px-4 py-3 text-[10px] font-extrabold uppercase tracking-wide transition" style="background-color:#1769aa;color:#ffffff" data-action="dashboard-actions#open" data-action-name="{{ action[3] }}" data-title="{{ action[1] }}" data-content="{{ action[2] }}">
-                        {{ action[0] }}
-                    </button>
-                {% endfor %}
+                <a href="{{ path('app_messages_index') }}" class="fit-action-button flex w-full items-center justify-center rounded-xl px-4 py-3 text-[10px] font-extrabold uppercase tracking-wide transition" style="background-color:#1769aa;color:#ffffff">Chat</a>
                 <a href="{{ path('app_notifications') }}" class="fit-action-button flex w-full items-center justify-center rounded-xl px-4 py-3 text-[10px] font-extrabold uppercase tracking-wide transition" style="background-color:#1769aa;color:#ffffff">Notifications</a>
                 <a href="{{ path('app_user_sessions') }}" class="fit-action-button flex w-full items-center justify-center rounded-xl px-4 py-3 text-[10px] font-extrabold uppercase tracking-wide transition" style="background-color:#1769aa;color:#ffffff">Mes séances</a>
                 <a href="{{ path('app_feedback') }}" class="fit-action-button flex w-full items-center justify-center rounded-xl px-4 py-3 text-[10px] font-extrabold uppercase tracking-wide transition" style="background-color:#1769aa;color:#ffffff">Feedback</a>
@@ -125,16 +118,6 @@
 
         {% include 'components/_app_navigation.html.twig' with {active: 'dashboard'} %}
 
-        <dialog class="w-[calc(100%-2rem)] max-w-md rounded-2xl border-0 p-0 text-[#1A2B48] shadow-2xl backdrop:bg-slate-900/50" data-dashboard-actions-target="dialog" data-action="click->dashboard-actions#closeOnBackdrop">
-            <div class="p-6">
-                <div class="flex items-start justify-between gap-4">
-                    <h2 class="text-lg font-black" data-dashboard-actions-target="dialogTitle"></h2>
-                    <button type="button" class="flex size-8 items-center justify-center rounded-full bg-slate-100 text-xl leading-none transition hover:bg-slate-200" aria-label="Fermer" data-action="dashboard-actions#close">×</button>
-                </div>
-                <p class="mt-4 text-sm leading-6 text-slate-600" data-dashboard-actions-target="dialogContent"></p>
-                <button type="button" class="mt-6 w-full rounded-xl bg-emerald-500 px-4 py-3 text-xs font-extrabold uppercase text-white transition hover:bg-emerald-600" data-action="dashboard-actions#close">Compris</button>
-            </div>
-        </dialog>
     </div>
 </div>
 {% endblock %}

@@ -11,6 +11,7 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotCompromisedPassword;
 use Symfony\Component\Validator\Constraints\PasswordStrength;
+use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 
 class ChangePasswordFormType extends AbstractType
@@ -43,6 +44,10 @@ class ChangePasswordFormType extends AbstractType
                             max: 4096,
                         ),
                         new PasswordStrength(),
+                        new Regex(pattern: '/\p{Lu}/u', message: 'Le mot de passe doit contenir au moins une majuscule.'),
+                        new Regex(pattern: '/\p{Ll}/u', message: 'Le mot de passe doit contenir au moins une minuscule.'),
+                        new Regex(pattern: '/\p{N}/u', message: 'Le mot de passe doit contenir au moins un chiffre.'),
+                        new Regex(pattern: '/[^\p{L}\p{N}\s]/u', message: 'Le mot de passe doit contenir au moins un caractère spécial.'),
                         new NotCompromisedPassword(),
                     ],
                     'label' => 'Nouveau mot de passe',

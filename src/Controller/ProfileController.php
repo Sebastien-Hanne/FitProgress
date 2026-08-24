@@ -14,8 +14,10 @@ use Symfony\Component\Mailer\MailerInterface;
 use App\Repository\JournalEntryRepository;
 use App\Service\ProfilePhotoUploader;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
@@ -130,7 +132,7 @@ final class ProfileController extends AbstractController
     }
 
     #[Route('/profile/delete', name: 'app_profile_delete', methods: ['POST'])]
-    public function deleteAccount(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher, ProfilePhotoUploader $photoUploader): Response
+    public function deleteAccount(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher, ProfilePhotoUploader $photoUploader, Security $security): Response
     {
         $user = $this->getCurrentUser();
         if (!$this->isCsrfTokenValid('delete-account', $request->request->getString('_token'))) {
@@ -144,10 +146,19 @@ final class ProfileController extends AbstractController
         }
 
         $photo = $user->getPhoto();
+        // Clear the security token and remember-me cookie while the user still
+        // has its Doctrine identifier. Otherwise the deleted user is written
+        // back into the session at the end of the request.
+        $logoutResponse = $security->logout(false);
         $entityManager->remove($user);
         $entityManager->flush();
         $photoUploader->delete($photo);
-        $request->getSession()->invalidate();
+
+        if ($logoutResponse instanceof RedirectResponse) {
+            $logoutResponse->setTargetUrl($this->generateUrl('app_login'));
+
+            return $logoutResponse;
+        }
 
         return $this->redirectToRoute('app_login');
     }

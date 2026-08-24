@@ -23,6 +23,20 @@ class NotificationRepository extends ServiceEntityRepository
         return $this->count(['user' => $user, 'isRead' => false]);
     }
 
+    public function hasTypeSince(User $user, NotificationType $type, \DateTimeImmutable $since): bool
+    {
+        return (int) $this->createQueryBuilder('notification')
+            ->select('COUNT(notification.id)')
+            ->andWhere('notification.user = :user')
+            ->andWhere('notification.type = :type')
+            ->andWhere('notification.createdAt >= :since')
+            ->setParameter('user', $user)
+            ->setParameter('type', $type)
+            ->setParameter('since', $since)
+            ->getQuery()
+            ->getSingleScalarResult() > 0;
+    }
+
     /** @return Notification[] */
     public function findWithoutCoachingHistory(User $user): array
     {

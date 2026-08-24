@@ -38,7 +38,7 @@ security:
         - { path: ^/register$, roles: PUBLIC_ACCESS }
         - { path: ^/register/coach$, roles: PUBLIC_ACCESS }
         - { path: ^/logout$, roles: PUBLIC_ACCESS }
-        - { path: ^/(conditions-utilisation|politique-confidentialite)$, roles: PUBLIC_ACCESS }
+        - { path: ^/(conditions-utilisation|politique-confidentialite|contact)$, roles: PUBLIC_ACCESS }
 
         # Administration
         - { path: ^/admin, roles: ROLE_ADMIN }
