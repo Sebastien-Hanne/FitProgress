@@ -19,4 +19,10 @@ final class LegalController extends AbstractController
     {
         return $this->render('legal/privacy.html.twig');
     }
+
+    #[Route('/contact', name: 'app_contact', methods: ['GET'])]
+    public function contact(): Response
+    {
+        return $this->render('legal/contact.html.twig');
+    }
 }

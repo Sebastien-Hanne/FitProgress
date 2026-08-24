@@ -93,6 +93,7 @@ final class NotificationController extends AbstractController
             NotificationType::session_scheduled, NotificationType::session_modified, NotificationType::session_cancelled => $this->redirectToRoute('app_user_sessions'),
             NotificationType::new_feedback => $this->redirectToRoute('app_feedback'),
             NotificationType::new_coach_request => $this->redirectToRoute('app_coach_requests_index'),
+            NotificationType::weigh_in_reminder, NotificationType::journal_reminder => $this->redirectToRoute('app_journal_today'),
             default => $this->redirectToRoute('app_notifications'),
         };
     }

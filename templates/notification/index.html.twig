@@ -11,12 +11,16 @@
     {% set notificationDay = notification.createdAt|date('Y-m-d') %}{% set group = notificationDay == today ? "Aujourd'hui" : (notificationDay == yesterday ? 'Hier' : notification.createdAt|date('d F Y')) %}
     {% if group != currentGroup %}{% if not loop.first %}</section>{% endif %}<h2 class="mb-3 mt-6 text-sm font-bold text-slate-500">{{ group }}</h2><section class="grid gap-3" aria-label="Notifications du {{ group }}">{% set currentGroup = group %}{% endif %}
     {% set iconClass = notification.type.value == 'request_rejected' or notification.type.value == 'session_cancelled' ? 'bg-rose-100 text-rose-700' : (notification.type.value starts with 'session_' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-500 text-white') %}
-    {% set opensContent = notification.type.value in ['new_message', 'new_feedback', 'new_coach_request', 'request_accepted'] %}
+    {% set opensContent = notification.type.value in ['new_message', 'new_feedback', 'new_coach_request', 'request_accepted', 'weigh_in_reminder', 'journal_reminder'] %}
     <article class="relative flex items-center gap-3 rounded-xl border bg-white p-4 shadow-sm transition {{ notification.read ? 'border-slate-200' : 'border-emerald-300 ring-1 ring-emerald-100' }} {{ opensContent ? 'hover:border-emerald-400 hover:shadow-md' : '' }}">
     {% if opensContent %}<a href="{{ path('app_notifications_open', {id: notification.id}) }}" class="flex min-w-0 flex-1 items-center gap-4 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500" aria-label="Ouvrir : {{ notification.title }}">{% else %}<div class="flex min-w-0 flex-1 items-center gap-4">{% endif %}
         <span class="flex size-10 shrink-0 items-center justify-center rounded-full {{ iconClass }}" aria-hidden="true">
             {% if notification.type.value == 'new_message' %}
                 <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5h16v12H8l-4 3V5zM8 9h8m-8 4h5"/></svg>
+            {% elseif notification.type.value == 'weigh_in_reminder' %}
+                <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14l1 12H4L5 8Z"/><path stroke-linecap="round" d="M8.5 8a3.5 3.5 0 0 1 7 0M12 11l2-1.5"/></svg>
+            {% elseif notification.type.value == 'journal_reminder' %}
+                <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M5 4h12a2 2 0 0 1 2 2v15H7a2 2 0 0 1-2-2V4Z"/><path stroke-linecap="round" d="M9 9h6m-6 4h6m-6 4h3"/></svg>
             {% elseif notification.type.value in ['new_coach_request', 'request_accepted', 'request_rejected'] %}
                 <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path stroke-linecap="round" stroke-linejoin="round" d="M3.5 20a5.5 5.5 0 0111 0M16 8h5m-2.5-2.5V11"/></svg>
             {% elseif notification.type.value == 'session_cancelled' %}

@@ -11,9 +11,15 @@
     input:checked + .privacy-switch { background: #00b887; }
     input:checked + .privacy-switch::after { transform: translateX(1.25rem); }
     .privacy-data-row { display: flex; width: 100%; align-items: center; gap: .75rem; padding: 1rem; text-align: left; font-size: .75rem; text-decoration: none; }
+    .privacy-data-icon { display: flex; width: 1.75rem; height: 1.75rem; flex: none; align-items: center; justify-content: center; border-radius: .55rem; background: #ecfdf5; color: #008567; }
+    .privacy-data-icon svg { width: 1rem; height: 1rem; }
+    .privacy-data-row.is-danger .privacy-data-icon { background: #fef2f2; color: #dc2626; }
+    .privacy-chevron { width: 1rem; height: 1rem; flex: none; color: #94a3b8; }
     .privacy-data-row + .privacy-data-row { border-top: 1px solid #e2e8f0; }
     .privacy-data-row.is-danger { color: #dc2626 !important; }
+    .privacy-section-icon { display: block; width: .8rem; height: .8rem; flex: none; }
     .privacy-protection-icon { display: flex; width: 4rem; height: 4rem; margin-inline: auto; align-items: center; justify-content: center; border-radius: 999px; background: #dff7ef; color: #008567; font-size: 1.5rem; }
+    .privacy-protection-icon svg { width: 1.75rem; height: 1.75rem; }
     .delete-confirmation { margin-top: 1rem; border: 1px solid #fecaca; border-radius: 1rem; background: #fff; padding: 1rem; }
     .delete-confirmation input { width: 100%; margin-top: .75rem; border: 1px solid #cbd5e1; border-radius: .75rem; padding: .8rem; }
     .delete-confirmation button { width: 100%; margin-top: .75rem; border: 0; border-radius: .75rem; background: #dc2626; padding: .8rem; color: #fff; font-weight: 800; }
@@ -42,7 +48,7 @@
 
         {% if not (is_granted('ROLE_COACH') and not is_granted('ROLE_ADMIN')) %}
             <section class="privacy-section" aria-labelledby="visibility-title">
-                <h2 id="visibility-title" class="mb-3 text-[10px] font-extrabold uppercase tracking-wider">◉ Visibilité du compte</h2>
+                <h2 id="visibility-title" class="mb-3 flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider"><svg class="privacy-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg> Visibilité du compte</h2>
                 <form method="post" class="privacy-card flex items-center gap-4 p-4">
                     <div class="flex-1"><strong class="block text-xs">Partager avec les coachs</strong><p class="mt-1 text-[10px] leading-4 text-slate-500">Permet à votre entraîneur de consulter votre journal et vos graphiques de progression.</p></div>
                     <label class="cursor-pointer"><span class="sr-only">Partager mon profil avec les coachs</span><input type="checkbox" name="is_profile_visible" value="1" class="sr-only" onchange="this.form.submit()" {{ app.user.profileVisible ? 'checked' : '' }}><span class="privacy-switch block"></span></label>
@@ -52,14 +58,14 @@
         {% endif %}
 
         <section class="privacy-section" aria-labelledby="data-title">
-            <h2 id="data-title" class="mb-3 text-[10px] font-extrabold uppercase tracking-wider">▤ Gestion des données</h2>
+            <h2 id="data-title" class="mb-3 flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider"><svg class="privacy-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5Z"/><path stroke-linecap="round" d="M8 8h8M8 12h8M8 16h5"/></svg> Gestion des données</h2>
             <div class="privacy-card overflow-hidden">
                 {% if not (is_granted('ROLE_COACH') and not is_granted('ROLE_ADMIN')) %}
-                    <a href="{{ path('app_journal_export') }}" class="privacy-data-row hover:bg-slate-50"><span>⇩</span><span class="flex-1">Exporter mon journal (CSV)</span><span class="text-slate-300">›</span></a>
+                    <a href="{{ path('app_journal_export') }}" class="privacy-data-row hover:bg-slate-50"><span class="privacy-data-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v12m0 0 4-4m-4 4-4-4M5 20h14"/></svg></span><span class="flex-1">Exporter mon journal (CSV)</span><svg class="privacy-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m9 18 6-6-6-6"/></svg></a>
                 {% endif %}
-                <a href="{{ path('app_legal_privacy') }}" class="privacy-data-row hover:bg-slate-50"><span>ⓘ</span><span class="flex-1">Politique de confidentialité</span><span class="text-slate-300">›</span></a>
-                <a href="{{ path('app_legal_terms') }}" class="privacy-data-row hover:bg-slate-50"><span>§</span><span class="flex-1">Conditions d’utilisation</span><span class="text-slate-300">›</span></a>
-                <button type="button" class="privacy-data-row is-danger" onclick="document.getElementById('delete-account-confirmation').hidden = !document.getElementById('delete-account-confirmation').hidden"><span>☒</span><span class="flex-1">Supprimer le compte</span><span>›</span></button>
+                <a href="{{ path('app_legal_privacy') }}" class="privacy-data-row hover:bg-slate-50"><span class="privacy-data-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path stroke-linecap="round" d="M12 10v5m0-8h.01"/></svg></span><span class="flex-1">Politique de confidentialité</span><svg class="privacy-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m9 18 6-6-6-6"/></svg></a>
+                <a href="{{ path('app_legal_terms') }}" class="privacy-data-row hover:bg-slate-50"><span class="privacy-data-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 3h9l4 4v14H6V3Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M14 3v5h5M9 13h6M9 17h4"/></svg></span><span class="flex-1">Conditions d’utilisation</span><svg class="privacy-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m9 18 6-6-6-6"/></svg></a>
+                <button type="button" class="privacy-data-row is-danger" onclick="document.getElementById('delete-account-confirmation').hidden = !document.getElementById('delete-account-confirmation').hidden"><span class="privacy-data-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 6h18M8 6V4h8v2m-9 0 1 15h8l1-15M10 10v7m4-7v7"/></svg></span><span class="flex-1">Supprimer le compte</span><svg class="privacy-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m9 18 6-6-6-6"/></svg></button>
             </div>
             <form id="delete-account-confirmation" class="delete-confirmation" method="post" action="{{ path('app_profile_delete') }}" hidden>
                 <strong class="text-sm text-red-700">Suppression définitive</strong>
@@ -71,7 +77,7 @@
             </form>
         </section>
 
-        <section class="privacy-protection text-center"><span class="privacy-protection-icon">♙</span><strong class="mt-4 block text-xs">Vos données sont protégées</strong><p class="mx-auto mt-2 max-w-sm text-[10px] leading-4 text-slate-500">FitProgress met en œuvre le hachage des mots de passe, une protection CSRF et des accès sécurisés par rôle pour protéger vos données.</p></section>
+        <section class="privacy-protection text-center"><span class="privacy-protection-icon"><svg class="size-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path stroke-linecap="round" stroke-linejoin="round" d="m9 12 2 2 4-4"/></svg></span><strong class="mt-4 block text-xs">Vos données sont protégées</strong><p class="mx-auto mt-2 max-w-sm text-[10px] leading-4 text-slate-500">FitProgress met en œuvre le hachage des mots de passe, une protection CSRF et des accès sécurisés par rôle pour protéger vos données.</p></section>
     </main>
     {% if is_granted('ROLE_COACH') and not is_granted('ROLE_ADMIN') %}{% include 'components/_coach_navigation.html.twig' with {active:'profile'} %}{% else %}{% include 'components/_app_navigation.html.twig' with {active: 'profile'} %}{% endif %}
 </div>

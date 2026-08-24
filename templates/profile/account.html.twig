@@ -49,7 +49,8 @@
 {% block body %}
 {% set goal = app.user.goal %}
 {% set isCoach = is_granted('ROLE_COACH') and not is_granted('ROLE_ADMIN') %}
-{% set gender = goal and goal.gender ? (goal.gender.value == 'male' ? 'Homme' : (goal.gender.value == 'female' ? 'Femme' : 'Autre')) : 'Non renseigné' %}
+{% set genderLabels = {'male': 'Homme', 'female': 'Femme', 'other': 'Autre', 'prefer_not_to_say': 'Ne préfère pas répondre'} %}
+{% set gender = goal and goal.gender ? genderLabels[goal.gender.value]|default('Non renseigné') : 'Non renseigné' %}
 <div class="fit-page fit-text min-h-screen font-sans">
     {% include 'components/_app_header.html.twig' %}
     <main class="account-main px-4 pb-28 pt-5">

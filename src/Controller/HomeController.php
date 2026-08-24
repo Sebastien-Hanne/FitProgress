@@ -3,14 +3,19 @@
 namespace App\Controller;
 
 use App\Entity\JournalEntry;
+use App\Entity\Notification;
 use App\Entity\User;
+use App\Enum\NotificationType;
 use App\Repository\FeedbackRepository;
 use App\Repository\JournalEntryRepository;
 use App\Repository\NotificationRepository;
 use App\Repository\CoachRequestRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use Doctrine\ORM\EntityManagerInterface;
 
 class HomeController extends AbstractController
 {
@@ -22,10 +27,12 @@ class HomeController extends AbstractController
 
     #[Route('/dashboard', name: 'dashboard', methods: ['GET'])]
     public function dashboard(
+        Request $request,
         JournalEntryRepository $journalEntries,
         FeedbackRepository $feedbacks,
         NotificationRepository $notifications,
         CoachRequestRepository $coachRequests,
+        EntityManagerInterface $entityManager,
     ): Response
     {
         $user = $this->getUser();
@@ -54,6 +61,36 @@ class HomeController extends AbstractController
         $daysSinceWeighIn = $latest?->getDate()
             ? max(0, (int) $latest->getDate()->diff(new \DateTimeImmutable('today'))->format('%r%a'))
             : null;
+        $today = new \DateTimeImmutable('today');
+        $hasJournalToday = $journalEntries->findOneForUserAndDate($user, $today) !== null;
+        $reminderCreated = false;
+
+        if (($daysSinceWeighIn === null || $daysSinceWeighIn >= 4)
+            && !$notifications->hasTypeSince($user, NotificationType::weigh_in_reminder, $today)
+        ) {
+            $content = $daysSinceWeighIn === null
+                ? 'Ajoutez votre première pesée pour commencer à suivre votre progression.'
+                : sprintf('Votre dernière pesée date de %d jours. Pensez à mettre votre poids à jour.', $daysSinceWeighIn);
+            $entityManager->persist((new Notification())
+                ->setUser($user)
+                ->setType(NotificationType::weigh_in_reminder)
+                ->setTitle('Pensez à vous peser')
+                ->setContent($content));
+            $reminderCreated = true;
+        }
+
+        if (!$hasJournalToday && !$notifications->hasTypeSince($user, NotificationType::journal_reminder, $today)) {
+            $entityManager->persist((new Notification())
+                ->setUser($user)
+                ->setType(NotificationType::journal_reminder)
+                ->setTitle('Votre journal vous attend')
+                ->setContent('Vous n’avez pas encore rempli votre journal aujourd’hui. Prenez quelques minutes pour noter votre journée.'));
+            $reminderCreated = true;
+        }
+
+        if ($reminderCreated) {
+            $entityManager->flush();
+        }
         $currentCoachRequest = $coachRequests->findCurrentForUser($user);
         $activeCoachProfile = $currentCoachRequest?->getStatus() === \App\Enum\RequestStatus::Approved
             ? $currentCoachRequest->getCoachProfile()
@@ -63,6 +100,11 @@ class HomeController extends AbstractController
             : null;
         $latestNotification = $notifications->findOneBy(['user' => $user], ['createdAt' => 'DESC']);
         $coachName = $latestFeedback?->getCoachProfile()?->getUser()?->getName();
+
+        $weightReminderDue = $daysSinceWeighIn === null || $daysSinceWeighIn >= 4;
+        if (!$weightReminderDue) {
+            $request->getSession()->remove('weight_reminder_dismissed');
+        }
 
         return $this->render('dashboard/index.html.twig', [
             'dashboard' => [
@@ -75,7 +117,7 @@ class HomeController extends AbstractController
                 'bmiColor' => $this->getBmiColor($bmi),
                 'bmiBadgeColor' => $this->getBmiBadgeColor($bmi),
                 'daysSinceWeighIn' => $daysSinceWeighIn,
-                'showWeightReminder' => $daysSinceWeighIn === null || $daysSinceWeighIn >= 5,
+                'showWeightReminder' => $weightReminderDue && !$request->getSession()->get('weight_reminder_dismissed', false),
                 'weightHistory' => [
                     'labels' => array_map(static fn (JournalEntry $entry): string => $entry->getDate()?->format('d/m') ?? '', $chartEntries),
                     'values' => array_map(static fn (JournalEntry $entry): float => (float) $entry->getWeight(), $chartEntries),
@@ -85,6 +127,18 @@ class HomeController extends AbstractController
                 'latestNotification' => $latestNotification?->getContent(),
             ],
         ]);
+    }
+
+    #[Route('/dashboard/dismiss-weight-reminder', name: 'app_dashboard_dismiss_weight_reminder', methods: ['POST'])]
+    public function dismissWeightReminder(Request $request): JsonResponse
+    {
+        if (!$this->isCsrfTokenValid('dismiss-weight-reminder', $request->getPayload()->getString('_token'))) {
+            throw $this->createAccessDeniedException('Jeton de sécurité invalide.');
+        }
+
+        $request->getSession()->set('weight_reminder_dismissed', true);
+
+        return $this->json(['dismissed' => true]);
     }
 
     private function calculateProgress(?string $initial, ?string $target, ?string $current): int

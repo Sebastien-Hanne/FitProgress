@@ -13,4 +13,6 @@ enum NotificationType: string {
     case certificate_approved = 'certificate_approved';
     case certificate_rejected = 'certificate_rejected';
     case new_feedback = 'new_feedback';
+    case weigh_in_reminder = 'weigh_in_reminder';
+    case journal_reminder = 'journal_reminder';
 }

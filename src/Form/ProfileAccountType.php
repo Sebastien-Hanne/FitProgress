@@ -29,7 +29,19 @@ final class ProfileAccountType extends AbstractType
             $builder->add('heightCm', IntegerType::class, ['label' => 'Taille (cm)', 'mapped' => false, 'constraints' => [new Assert\Range(min: 80, max: 250)]])
             ->add('targetWeight', NumberType::class, ['label' => 'Poids cible (kg)', 'mapped' => false, 'scale' => 1, 'constraints' => [new Assert\Range(min: 20, max: 500)]])
             ->add('birthDate', DateType::class, ['label' => 'Date de naissance', 'mapped' => false, 'widget' => 'single_text', 'input' => 'datetime_immutable', 'constraints' => [new Assert\NotBlank(), new Assert\LessThan('-12 years')]])
-                ->add('gender', ChoiceType::class, ['label' => 'Genre', 'mapped' => false, 'required' => false, 'choices' => ['Homme' => Gender::Male, 'Femme' => Gender::Female, 'Autre' => Gender::Other], 'choice_value' => static fn (?Gender $gender): ?string => $gender?->value]);
+                ->add('gender', ChoiceType::class, [
+                    'label' => 'Genre (optionnel)',
+                    'mapped' => false,
+                    'required' => false,
+                    'placeholder' => 'Non renseigné (optionnel)',
+                    'choices' => [
+                        'Homme' => Gender::Male,
+                        'Femme' => Gender::Female,
+                        'Autre' => Gender::Other,
+                        'Ne préfère pas répondre' => Gender::PreferNotToSay,
+                    ],
+                    'choice_value' => static fn (?Gender $gender): ?string => $gender?->value,
+                ]);
         }
     }
 

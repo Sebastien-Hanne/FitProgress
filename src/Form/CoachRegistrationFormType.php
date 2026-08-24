@@ -14,6 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\Email;
 
 class CoachRegistrationFormType extends AbstractType
@@ -70,6 +71,10 @@ class CoachRegistrationFormType extends AbstractType
                         max: 4096,
                         minMessage: 'Votre mot de passe doit faire au moins {{ limit }} caractères.'
                     ),
+                    new Regex(pattern: '/\p{Lu}/u', message: 'Le mot de passe doit contenir au moins une majuscule.'),
+                    new Regex(pattern: '/\p{Ll}/u', message: 'Le mot de passe doit contenir au moins une minuscule.'),
+                    new Regex(pattern: '/\p{N}/u', message: 'Le mot de passe doit contenir au moins un chiffre.'),
+                    new Regex(pattern: '/[^\p{L}\p{N}\s]/u', message: 'Le mot de passe doit contenir au moins un caractère spécial.'),
                 ],
             ])
 

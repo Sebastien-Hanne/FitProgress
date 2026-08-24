@@ -429,6 +429,23 @@
                 border-left: 1px solid #e2e8f0;
                 border-right: 1px solid #e2e8f0;
             }
+            @media (max-width: 1023px) {
+                html, body { width: 100%; max-width: 100%; overflow-x: hidden; }
+                .dashboard-grid {
+                    display: grid !important;
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    grid-template-columns: minmax(0, 1fr) !important;
+                }
+                .dashboard-grid > * {
+                    min-width: 0 !important;
+                    max-width: 100% !important;
+                    grid-column: 1 / -1 !important;
+                }
+                .dashboard-stat-card, .dashboard-chart, .dashboard-actions { overflow: hidden; }
+                .dashboard-chart canvas { display: block; width: 100% !important; max-width: 100% !important; }
+                .dashboard-weight > div { max-width: 100%; }
+            }
             @media (min-width: 1024px) {
                 .dashboard-grid {
                     display: grid !important;
