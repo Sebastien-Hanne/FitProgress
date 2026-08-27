@@ -76,6 +76,101 @@ body {
     color: #cbd5e1 !important;
 }
 
+/* Les pages historiques utilisent encore des fonds et couleurs explicites.
+   Ces règles garantissent une apparence sombre cohérente dans toute l'application. */
+.fit-dark-mode .fit-text,
+.fit-dark-mode .text-\[\#1A2B48\],
+.fit-dark-mode .text-\[\#15233c\],
+.fit-dark-mode .text-slate-950 {
+    color: #f8fafc !important;
+}
+
+.fit-dark-mode .profile-shell,
+.fit-dark-mode .journal-shell {
+    background-color: #111827 !important;
+}
+
+.fit-dark-mode .journal-card,
+.fit-dark-mode .journal-day:not(.is-today),
+.fit-dark-mode .dashboard-stat-card,
+.fit-dark-mode .dashboard-chart,
+.fit-dark-mode .dashboard-actions,
+.fit-dark-mode .profile-identity,
+.fit-dark-mode .profile-physical,
+.fit-dark-mode .profile-goal,
+.fit-dark-mode .profile-history,
+.fit-dark-mode .profile-stat-grid > div {
+    border-color: #475569 !important;
+    background-color: #1f2937 !important;
+    color: #f8fafc !important;
+}
+
+.fit-dark-mode .app-nav-item:not(.is-active) {
+    color: #cbd5e1 !important;
+}
+
+.fit-dark-mode .profile-settings a:hover {
+    background-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+.fit-dark-mode .bg-slate-50,
+.fit-dark-mode .bg-slate-100 {
+    background-color: #334155 !important;
+}
+
+.fit-dark-mode .border-slate-100,
+.fit-dark-mode .border-slate-200,
+.fit-dark-mode .border-slate-300 {
+    border-color: #475569 !important;
+}
+
+.fit-dark-mode .journal-meal-type select,
+.fit-dark-mode .journal-meal-title input,
+.fit-dark-mode .journal-meal-calories input,
+.fit-dark-mode .journal-weight-input,
+.fit-dark-mode .journal-notes {
+    color: #f8fafc !important;
+}
+
+.fit-dark-mode .journal-notes {
+    border-color: #475569 !important;
+    background-color: #334155 !important;
+}
+
+.fit-dark-mode .journal-activity-ring::before {
+    background-color: #1f2937 !important;
+}
+
+.fit-dark-mode .journal-shell .journal-card h2,
+.fit-dark-mode .journal-shell .journal-card strong {
+    color: #f8fafc !important;
+}
+
+.fit-dark-mode .journal-shell .journal-choice-grid label {
+    color: #dbeafe !important;
+    font-size: .7rem;
+}
+
+.fit-dark-mode .journal-shell .text-slate-400,
+.fit-dark-mode .journal-shell .text-slate-500,
+.fit-dark-mode .journal-shell .text-slate-600 {
+    color: #dbeafe !important;
+}
+
+.fit-dark-mode .journal-shell .text-emerald-700,
+.fit-dark-mode .journal-shell .text-emerald-800 {
+    color: #5eead4 !important;
+}
+
+.fit-dark-mode .journal-shell .journal-energy-grid label::before {
+    background-color: #99f6e4;
+}
+
+.fit-dark-mode .journal-shell .journal-energy-grid input:checked + label::before {
+    background-color: #10b981;
+}
+
 .fit-voice-assistance :focus-visible {
     outline: 4px solid #f59e0b !important;
     outline-offset: 3px !important;
