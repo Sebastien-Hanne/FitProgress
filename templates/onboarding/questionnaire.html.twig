@@ -1,5 +1,19 @@
 {% extends 'base.html.twig' %}
 {% block title %}Votre objectif | FitProgress{% endblock %}
+{% block stylesheets %}
+    <style>
+        .onboarding-number-input[type='number'] {
+            appearance: textfield;
+            -moz-appearance: textfield;
+        }
+
+        .onboarding-number-input[type='number']::-webkit-inner-spin-button,
+        .onboarding-number-input[type='number']::-webkit-outer-spin-button {
+            margin: 0;
+            -webkit-appearance: none;
+        }
+    </style>
+{% endblock %}
 {% block body %}
 <div class="min-h-screen bg-slate-500/80 flex items-center justify-center p-4 py-8 font-sans">
     <main class="max-w-md w-full bg-[#f4f9fb] rounded-[2.5rem] shadow-2xl p-7 border border-slate-100">
@@ -17,7 +31,10 @@
             {% for item in fields %}
                 <div>
                     {{ form_label(item[0], null, {label_attr: {class: 'block text-xs font-bold text-[#1a2b48] mb-1'}}) }}
-                    <div class="relative">{{ form_widget(item[0], {attr: {class: 'w-full px-4 py-3 bg-white rounded-2xl text-sm text-slate-800 border border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-400 ' ~ (item[2] ? 'pr-12 appearance-none' : ''), placeholder: item[1]}}) }}{% if item[2] %}<span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400" aria-hidden="true">{{ item[2] }}</span>{% endif %}</div>
+                    <div class="relative">
+                        {{ form_widget(item[0], {attr: {class: 'onboarding-number-input w-full px-4 py-3 bg-white rounded-2xl text-sm text-slate-800 border border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-400 ' ~ (item[2] ? 'pr-12' : ''), placeholder: item[1]}}) }}
+                        {% if item[2] %}<span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400" aria-hidden="true">{{ item[2] }}</span>{% endif %}
+                    </div>
                     <div class="mt-1 text-[10px] text-red-600">{{ form_errors(item[0]) }}</div>
                 </div>
             {% endfor %}
